@@ -47,11 +47,6 @@ export class AppController {
     );
     console.log('info', 'Finished converting');
 
-    try {
-      await this.appService.addToDB(message.link, message.id);
-    } catch (err) {
-      console.error(err);
-    }
     console.log('info', 'Uploading');
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Uploading,

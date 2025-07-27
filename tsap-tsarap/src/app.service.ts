@@ -9,9 +9,6 @@ import * as Ffmpeg from 'fluent-ffmpeg';
 import Stream from 'node:stream';
 import { InjectS3, S3 } from 'nestjs-s3';
 import { createReadStream, readFileSync } from 'node:fs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Link } from './link/link.entity';
 import { readdir, rm } from 'node:fs/promises';
 import promisifyCommand from './utils/promisifyCommand';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +20,6 @@ export class AppService implements OnModuleInit {
   constructor(
     @InjectS3() private readonly s3: S3,
     @Inject('KAFKA_SERVICE') private readonly kafkaService: ClientKafka,
-    @InjectRepository(Link) private linkRepository: Repository<Link>,
     private configService: ConfigService,
   ) {}
 
@@ -31,17 +27,6 @@ export class AppService implements OnModuleInit {
     await this.kafkaService.connect();
   }
 
-  async checkTrackInDatabase(videoId: string) {
-    const result = await this.linkRepository.findOneBy({ videoId });
-
-    if (!result) return false;
-
-    return result;
-  }
-
-  addToDB(link: string, id: string) {
-    return this.linkRepository.save({ link, videoId: id });
-  }
 
   async getVideoReadableStream(link: string) {
     const agent = createAgent(
@@ -94,7 +79,7 @@ export class AppService implements OnModuleInit {
       files.forEach(async (file) => {
         const filepath = dir + '/' + file.name;
         await this.s3.putObject({
-          Bucket: this.configService.get('S3_BUCKET_NAME'),
+          Bucket: process.env.S3_BUCKET_NAME,
           Body: createReadStream(filepath),
           Key: id + '/' + file.name,
         });

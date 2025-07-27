@@ -3,6 +3,7 @@ networks:
 volumes:
   db-data:
   garage-data:
+  garage-meta:
 
 
 
@@ -13,6 +14,7 @@ services:
     restart: always
     volumes:
       - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - 3000:3000
     depends_on:
@@ -43,7 +45,10 @@ services:
     restart: always
     volumes:
       - ./tsap-tsarap:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_WEBSITE_ENDPOINT: ${S3_WEBSITE_ENDPOINT}
@@ -60,8 +65,8 @@ services:
       - 3903:3903
     volumes:
       - ./garage/garage.toml:/etc/garage.toml
-      - garage-data/meta:/var/lib/garage/meta
-      - garage-data/data:/var/lib/garage/data
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
     networks:
       - spotihack-shared-network
   kafka:

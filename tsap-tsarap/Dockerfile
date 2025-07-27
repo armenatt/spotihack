@@ -9,18 +9,13 @@ RUN apt-get install ffmpeg -y
 RUN ffmpeg -version
 # =================================
 
-# Setup a working directory to allow for
-# docker run --rm -ti -v ${PWD}:/work ...
-# =======================================
-WORKDIR /work
-
 
 #Create app dir
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 #Install Dependencies
-COPY package.json /usr/src/app
+COPY package*.json /usr/src/app
 RUN npm install
 
 #Bundle app source
