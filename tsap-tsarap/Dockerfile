@@ -1,0 +1,30 @@
+FROM node:22
+
+WORKDIR /usr/local/src
+
+RUN apt-get upgrade && apt-get update
+RUN apt-get install ffmpeg -y
+
+# Custom Builds go here
+RUN ffmpeg -version
+# =================================
+
+# Setup a working directory to allow for
+# docker run --rm -ti -v ${PWD}:/work ...
+# =======================================
+WORKDIR /work
+
+
+#Create app dir
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+#Install Dependencies
+COPY package.json /usr/src/app
+RUN npm install
+
+#Bundle app source
+COPY . /usr/src/app
+
+EXPOSE 3000
+CMD [ "npm", "start" ]

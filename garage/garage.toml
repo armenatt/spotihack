@@ -1,0 +1,26 @@
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "lmdb"
+
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "9c67d0d558cfcf2821b4a0ab62ac1f85c32ec2b9a93ca35767de45181d9dde36"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = "localhost"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = "localhost"
+index = "index.html"
+
+[k2v_api]
+api_bind_addr = "[::]:3904"
+
+[admin]
+api_bind_addr = "0.0.0.0:3903"
+admin_token = "472070e320469b2f048f77dcad4149e0c608ef01ecf0ac863c416287a1127a9e"
