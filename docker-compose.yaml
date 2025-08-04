@@ -54,6 +54,18 @@ services:
       S3_WEBSITE_ENDPOINT: ${S3_WEBSITE_ENDPOINT}
     networks:
       - spotihack-shared-network
+  s3-nginx:
+    build: ./openresty/
+    container_name: s3-nginx
+    ports:
+      - 9999:123
+    volumes:
+      - ./openresty/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+    networks:
+      - spotihack-shared-network
   garage:
     container_name: garage
     image: dxflrs/garage:v2.0.0
