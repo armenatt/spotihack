@@ -1,0 +1,19 @@
+@use './variables.scss';
+@use './typography.scss';
+
+*, body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background: black;
+    color: white;
+    font-family: "Helvetica Neue";
+    height: 100%;
+}

@@ -1,0 +1,16 @@
+
+<div [class]="['base-input', error() && 'base-input--error']">
+    @if (label()?.length) {
+        <label [for]="id()">{{label()}}</label>
+    }
+    <input [id]="id()" [type]="type() === 'password' ? (showPassword() ? 'text' : 'password') : 'text'" [placeholder]="placeholder()"  />
+    @if (type() === "password") {   
+        <base-button class="base-input__eye" variant="text" [iconSize]="24" [iconOnly]="true" [icon]="showPassword() ? 'eye' : 'eye-crossed'" (click)="showPassword.set(!showPassword())" />
+    }
+    @if (typeof error() !== 'boolean' && !!error()) {
+        <div class="base-input__error">
+            <base-icon size="16" icon="info-circled" />
+            <span>{{error()}}</span>
+        </div>
+    }
+</div>

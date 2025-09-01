@@ -1,0 +1,11 @@
+.login-page {
+  &__title {
+    font-size: 3rem;
+    margin-bottom: 40px;
+    word-break: break-word;
+
+    @media (max-width: spacings.$media-mobile-screen) {
+      font-size: 2rem;
+    }
+  }
+}

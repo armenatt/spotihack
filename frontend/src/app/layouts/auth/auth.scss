@@ -1,0 +1,31 @@
+@use "spacings";
+
+.auth-layout {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    background-color: var(--background-base);
+
+    &__header {
+        display: flex;
+        justify-content: center;
+        padding: 32px 0;
+        font-weight: bold;
+        font-size: 2rem;
+        font-family: "Milker";
+        user-select: none;
+        @media (max-width: spacings.$media-mobile-screen) {
+            font-size: 1.5rem;
+        }
+    }
+
+    &__footer {
+        display: flex;
+        margin-top: auto;
+        justify-content: center;
+    }
+}
