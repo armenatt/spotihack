@@ -1,6 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ETrackStatuses } from './trackStatuses';
 
 @Entity()
@@ -17,9 +20,12 @@ export class Track {
   @Column({ enum: ETrackStatuses, default: ETrackStatuses.Started })
   status: ETrackStatuses;
   @Column({ nullable: true })
-  duration: string;
+  duration: number;
   @Column({ nullable: true })
   videoId: string;
 
   m3u8Raw: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

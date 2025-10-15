@@ -4,5 +4,5 @@ export class TrackUpadteDto {
   id: string;
   status: ETrackStatuses;
   name?: string;
-  duration?: string;
+  duration?: number;
 }

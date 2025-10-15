@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Response,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dtos/register-dto';
@@ -51,7 +52,7 @@ export class AuthService {
     );
 
     if (alreadyExists) {
-      throw new BadRequestException('Email already registred');
+      throw new BadRequestException('Email already exists');
     }
 
     const newPlaylist =
@@ -63,6 +64,10 @@ export class AuthService {
       registerDto.password,
       newPlaylist,
     );
+
+    newPlaylist.user = newUser;
+
+    await this.trackPlaylistService.updatePlaylist(newPlaylist);
 
     return newUser;
   }

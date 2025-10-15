@@ -30,7 +30,7 @@ export class TrackPlaylistController {
   @UseGuards(AuthGuard)
   @Post('track/upload')
   uploadTrack(
-    @Req() req: { user: { userId: string; email: string } },
+    @Req() req: { user: { id: string; email: string } },
     @Body() payload: UploadTrackDto,
   ) {
     return this.trackPlaylistService.uploadTrack(payload.link, req.user);

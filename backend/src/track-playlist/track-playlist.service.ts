@@ -29,7 +29,7 @@ export class TrackPlaylistService implements OnModuleInit {
     await this.client.connect();
   }
 
-  async uploadTrack(link: string, user: { userId: string; email: string }) {
+  async uploadTrack(link: string, user: { id: string; email: string }) {
     const isValidYTLink = validateURL(link);
     if (!isValidYTLink) {
       return {
@@ -48,7 +48,7 @@ export class TrackPlaylistService implements OnModuleInit {
       return alreadyExists;
     }
 
-    const foundUser = await this.userService.findOneById(user.userId);
+    const foundUser = await this.userService.findOneById(user.id);
 
     const newTrack = this.trackRepository.create({
       status: ETrackStatuses.Started,
@@ -57,11 +57,7 @@ export class TrackPlaylistService implements OnModuleInit {
 
     const savedTrack = await this.trackRepository.save(newTrack);
 
-    const res = await this.addTrackToPlaylist(
-      foundUser?.favouriteTracks!,
-      savedTrack,
-    );
-    console.log(res);
+    await this.addTrackToPlaylist(foundUser?.favouriteTracks!, savedTrack);
 
     const newTrackInfo = {
       link,
@@ -82,7 +78,7 @@ export class TrackPlaylistService implements OnModuleInit {
     id: string,
     status: ETrackStatuses,
     name?: string,
-    duration?: string,
+    duration?: number,
   ) {
     return this.trackRepository.update({ id }, { status, name, duration });
   }
@@ -116,7 +112,6 @@ export class TrackPlaylistService implements OnModuleInit {
       const user = await this.userService.findOneByEmail(email);
       newPlaylist.user = user!;
     }
-
     return this.playlistRepository.save(newPlaylist);
   }
 
@@ -150,16 +145,21 @@ export class TrackPlaylistService implements OnModuleInit {
   }
 
   async getFavouriteTracks(userId: string) {
-    const user = await this.userService.findOneById(userId);
+    const playlist = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .where(`playlist.userId= :userId`, { userId })
+      .leftJoinAndSelect('playlist.tracks', 'track')
+      .loadRelationCountAndMap('playlist.trackCount', 'playlist.tracks')
+      .orderBy('track.createdAt', 'DESC')
+      .getOne();
 
-    if (!user?.favouriteTracks.tracks) {
-      return [];
-    }
+    const { durationSum } = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .where(`playlist.userId= :userId`, { userId })
+      .leftJoin('playlist.tracks', 'tracks')
+      .select('SUM(tracks.duration)', 'durationSum')
+      .getRawOne();
 
-    for (const track of user.favouriteTracks.tracks) {
-      track.m3u8Raw = btoa(await this.downloadTrackM3U8ById(track.id));
-    }
-
-    return user?.favouriteTracks;
+    return { ...playlist, durationSum };
   }
 }

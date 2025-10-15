@@ -3,6 +3,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -24,10 +25,10 @@ export class User {
 
   @Column()
   password: string;
-  @OneToOne(() => Playlist)
+  @OneToOne(() => Playlist, (playlist) => playlist.user)
   @JoinColumn()
   favouriteTracks: Playlist;
 
-  @OneToMany(() => Playlist, (playlist) => playlist.user)
+  @OneToMany(() => Playlist, (playlist) => playlist.user, { cascade: true })
   playlists: Playlist[];
 }
