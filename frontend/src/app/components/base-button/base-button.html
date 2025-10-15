@@ -1,8 +1,0 @@
-<button [class]="['base-button', variantClass(), iconOnlyClass]">
-  @if (icon()?.length) {
-    <base-icon class="base-button__icon" [icon]="icon()" [size]="iconSize()" />
-  }
-  <span>
-    <ng-content></ng-content>
-  </span>
-</button>
