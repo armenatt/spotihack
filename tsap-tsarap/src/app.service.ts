@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Innertube } from 'youtubei.js';
 import getMinutes from './utils/getMinutes';
-import { getInfo, downloadFromInfo, createAgent } from '@distube/ytdl-core';
 import * as Ffmpeg from 'fluent-ffmpeg';
-import Stream from 'node:stream';
+import Stream, { Readable } from 'node:stream';
 import { InjectS3, S3 } from 'nestjs-s3';
-import { createReadStream, readFileSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { readdir, rm } from 'node:fs/promises';
 import promisifyCommand from './utils/promisifyCommand';
 import { ConfigService } from '@nestjs/config';
@@ -27,28 +24,35 @@ export class AppService implements OnModuleInit {
     await this.kafkaService.connect();
   }
 
-
   async getVideoReadableStream(link: string) {
-    const agent = createAgent(
-      JSON.parse(readFileSync('./cookies.json').toString()),
-    );
-    let info;
-    try {
-      info = await getInfo(link, { agent });
-    } catch (error) {
-      console.log(error);
-      return;
-    }
+    const id = new URLSearchParams(new URL(link).searchParams).get('v');
 
-    if (getMinutes(Number(info.formats[0].approxDurationMs)) > 10) {
+    const instance = await Innertube.create({
+      player_id: '0004de42',
+    });
+    console.log(id);
+
+    const info = await instance.getBasicInfo(id!);
+    const audio = await info.download();
+
+    // const agent = createAgent();
+    // let info;
+    // try {
+    //   info = await getInfo(link, { agent });
+    // } catch (error) {
+    //   console.log(error);
+    //   return;
+    // }
+
+    if (getMinutes(Number(info.basic_info.duration)) > 10) {
       console.log('More than 10 minutes');
       return;
     }
 
-    const audio = downloadFromInfo(info, { filter: 'audioonly', agent });
+    // const audio = downloadFromInfo(info, { filter: 'audioonly', agent });
     return {
-      audio,
-      info: info.videoDetails,
+      audio: Readable.from(audio),
+      info: info.basic_info,
     };
   }
 
@@ -57,6 +61,8 @@ export class AppService implements OnModuleInit {
     id: string,
     targetPath: string,
   ) {
+    console.log(input);
+
     const command = Ffmpeg(input);
     command
       .addOutputOption('-f segment')
@@ -91,7 +97,7 @@ export class AppService implements OnModuleInit {
 
   async updateTrackStatus(
     id: string,
-    payload: { status: ETrackStatuses; name?: string; duration?: string },
+    payload: { status: ETrackStatuses; name?: string; duration?: number },
   ) {
     await this.kafkaService.producer.send({
       topic: 'tsap-tsarap.upload.update-status',

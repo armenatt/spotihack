@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { validateURL } from '@distube/ytdl-core';
-import { mkdirSync } from 'fs';
+import { existsSync, mkdirSync } from 'fs';
 import { UploadTrackDto } from './dtos/upload-track-dto';
 import { ETrackStatuses } from './trackStatuses';
 
@@ -33,9 +33,11 @@ export class AppController {
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Downloading,
       name: result.info.title,
-      duration: result.info.lengthSeconds,
+      duration: result.info.duration,
     });
-    mkdirSync(targetDir);
+    if (!existsSync(targetDir)) {
+      mkdirSync(targetDir);
+    }
     console.log('info', 'Converting');
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Processing,
