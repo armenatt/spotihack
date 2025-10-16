@@ -64,6 +64,12 @@ const props = withDefaults(
   &__icon {
   }
 
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
   &--icon-only {
     justify-content: center;
     margin-right: 0;

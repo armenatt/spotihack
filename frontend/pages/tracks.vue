@@ -8,6 +8,7 @@
       :playing="isPlaying"
       :username="user.username"
       @track="onChooseTrack"
+      @play-playlist="onPlayPlaylist"
     />
   </div>
 </template>
@@ -30,6 +31,14 @@ const onChooseTrack = (track: TTrack) => {
   currentlyPlayingPlaylist.value = favouriteTracks.value;
   currentlyPlayingTrack.value = track;
   isPlaying.value = true;
+};
+
+const onPlayPlaylist = () => {
+  if (currentlyPlayingPlaylist.value?.id === favouriteTracks.value?.id) {
+    isPlaying.value = !isPlaying.value;
+    return;
+  }
+  onChooseTrack(favouriteTracks.value?.tracks[0]!);
 };
 </script>
 

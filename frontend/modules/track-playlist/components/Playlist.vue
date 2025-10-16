@@ -25,7 +25,7 @@
         :icon="playing ? 'pause' : 'play'"
         icon-only
         :icon-size="25"
-        @click="emit('track', playlist.tracks[0])"
+        @click="emit('playPlaylist')"
       />
       <SButton
         icon="download"
@@ -64,7 +64,7 @@ import type { TPlaylist, TTrack } from "../entities";
 import TrackTable from "./TrackTable/index.vue";
 import Track from "./TrackTable/Track.vue";
 
-const emit = defineEmits(["track"]);
+const emit = defineEmits(["track", "playPlaylist"]);
 
 const props = defineProps<{
   username: string;
@@ -152,7 +152,7 @@ const onClickOnTrack = (track: TTrack) => {
     font-size: 48px;
     font-weight: 700;
     line-height: 48px;
-    margin-left: -5px;
+    margin-left: -2px;
   }
 
   &__bottom {

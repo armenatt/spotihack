@@ -10,8 +10,12 @@
       <Player
         :track="currentlyPlayingTrack"
         :playing="isPlaying"
+        :disabledNext="!nextTrack"
+        :disabledPrev="!prevTrack"
         @pause="isPlaying = false"
         @play="isPlaying = true"
+        @next="onNext"
+        @prev="onPrev"
         @ended="onTrackEnded"
       />
     </div>
@@ -24,6 +28,8 @@ import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 
 const { $services } = useNuxtApp();
 
+await $services.trackPlaylistService.getFavouriteTracks();
+
 const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
   storeToRefs(useTrackPlaylistStore());
 
@@ -32,16 +38,38 @@ const nextTrack = computed(() => {
     (track) => track.id === currentlyPlayingTrack.value?.id
   );
 
-  if (!index) {
+  if (index === -1) {
     return undefined;
   }
   return currentlyPlayingPlaylist.value?.tracks[index + 1];
 });
+
+const prevTrack = computed(() => {
+  const index = currentlyPlayingPlaylist.value?.tracks.findIndex(
+    (track) => track.id === currentlyPlayingTrack.value?.id
+  );
+
+  if (index === -1) {
+    return undefined;
+  }
+  return currentlyPlayingPlaylist.value?.tracks[index - 1];
+});
+
+const disablePrev = computed(() => {
+  return !nextTrack.value;
+});
+
 const onTrackEnded = () => {
   currentlyPlayingTrack.value = nextTrack.value;
 };
 
-await $services.trackPlaylistService.getFavouriteTracks();
+const onNext = () => {
+  currentlyPlayingTrack.value = nextTrack.value;
+};
+
+const onPrev = () => {
+  currentlyPlayingTrack.value = prevTrack.value;
+};
 </script>
 
 <style lang="scss">
@@ -53,7 +81,7 @@ await $services.trackPlaylistService.getFavouriteTracks();
 
   &__top {
     display: flex;
-    padding: 8px;
+    padding: 8px 8px 0;
     gap: 8px;
     overflow-y: auto;
   }
