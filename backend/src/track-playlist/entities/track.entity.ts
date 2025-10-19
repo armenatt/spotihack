@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ETrackStatuses } from './trackStatuses';
+import { PlaylistTrack } from './playlist-track.entity';
 
 @Entity()
 export class Track {
@@ -23,6 +25,9 @@ export class Track {
   duration: number;
   @Column({ nullable: true })
   videoId: string;
+
+  @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.track)
+  playlistTrack: PlaylistTrack[];
 
   m3u8Raw: string;
 

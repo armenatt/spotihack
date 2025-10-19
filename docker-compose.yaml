@@ -57,6 +57,8 @@ services:
   s3-nginx:
     build: ./openresty/
     container_name: s3-nginx
+    depends_on:
+      - garage
     ports:
       - 9999:123
     volumes:

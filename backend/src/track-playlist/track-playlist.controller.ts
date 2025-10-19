@@ -78,7 +78,7 @@ export class TrackPlaylistController {
       throw new NotFoundException('Track not found');
     }
 
-    playlist?.tracks.push(track);
+    // playlist?.playlistTrack.push(track);
 
     return this.trackPlaylistService.updatePlaylist(playlist);
   }

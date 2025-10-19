@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { TrackPlaylistModule } from './track-playlist/track-playlist.module';
 import { Track } from './track-playlist/entities/track.entity';
 import { Playlist } from './track-playlist/entities/playlist.entity';
+import { PlaylistTrack } from './track-playlist/entities/playlist-track.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { Playlist } from './track-playlist/entities/playlist.entity';
       username: 'armenat',
       password: 'armenat',
       database: 'spotihack',
-      entities: [User, Track, Playlist],
+      entities: [User, Track, Playlist, PlaylistTrack],
       synchronize: true,
     }),
     UserModule,

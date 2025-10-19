@@ -3,13 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Track } from './track.entity';
+import { PlaylistTrack } from './playlist-track.entity';
 
 @Entity()
 export class Playlist {
@@ -22,9 +21,8 @@ export class Playlist {
   @OneToOne(() => User, (user) => user.favouriteTracks)
   favouritedBy: User;
 
-  @ManyToMany(() => Track, { cascade: true })
-  @JoinTable()
-  tracks: Track[];
+  @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.playlist)
+  playlistTrack: PlaylistTrack[];
 
   @CreateDateColumn()
   createdAt: Date;

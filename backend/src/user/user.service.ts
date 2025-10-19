@@ -20,7 +20,7 @@ export class UserService {
       where: { id },
       relations: {
         favouriteTracks: {
-          tracks: true,
+          playlistTrack: true,
         },
       },
     });

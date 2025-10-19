@@ -8,11 +8,12 @@ import { S3Module } from 'nestjs-s3';
 import { UserModule } from 'src/user/user.module';
 import { Playlist } from './entities/playlist.entity';
 import { Track } from './entities/track.entity';
+import { PlaylistTrack } from './entities/playlist-track.entity';
 
 @Module({
   imports: [
     UserModule,
-    TypeOrmModule.forFeature([Playlist, Track]),
+    TypeOrmModule.forFeature([Playlist, Track, PlaylistTrack]),
     ConfigModule.forRoot({ isGlobal: true }),
     ClientsModule.register([
       {

@@ -12,6 +12,7 @@ import { Playlist } from './entities/playlist.entity';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { ETrackStatuses } from './entities/trackStatuses';
+import { PlaylistTrack } from './entities/playlist-track.entity';
 
 @Injectable()
 export class TrackPlaylistService implements OnModuleInit {
@@ -20,6 +21,8 @@ export class TrackPlaylistService implements OnModuleInit {
     private readonly playlistRepository: Repository<Playlist>,
     @InjectRepository(Track)
     private readonly trackRepository: Repository<Track>,
+    @InjectRepository(PlaylistTrack)
+    private readonly playlistTrackRepository: Repository<Playlist>,
     @Inject('KAFKA_SERVICE') private readonly client: ClientKafka,
     @Inject() private readonly userService: UserService,
     @InjectS3() private readonly s3: S3,
@@ -84,7 +87,6 @@ export class TrackPlaylistService implements OnModuleInit {
   }
 
   async downloadTrackM3U8ById(id: string) {
-    console.log(id);
     const res = await this.s3.getObject({
       Bucket: 'tsap-tsarap-bucket',
       Key: `${id}/${id}.m3u8`,
@@ -124,7 +126,9 @@ export class TrackPlaylistService implements OnModuleInit {
     const playlist = await this.playlistRepository.findOne({
       where: { id: playlistId, user },
       relations: {
-        tracks: true,
+        playlistTrack: {
+          track: true,
+        },
       },
     });
 
@@ -140,26 +144,46 @@ export class TrackPlaylistService implements OnModuleInit {
   }
 
   async addTrackToPlaylist(playlist: Playlist, track: Track) {
-    playlist.tracks.push(track);
+    const playlistTrack = new PlaylistTrack();
+
+    playlistTrack.track = track;
+    playlistTrack.playlist = playlist;
+
+    playlist.playlistTrack.push(playlistTrack);
+    await this.playlistTrackRepository.save(playlistTrack);
     return this.playlistRepository.save(playlist);
   }
 
   async getFavouriteTracks(userId: string) {
     const playlist = await this.playlistRepository
       .createQueryBuilder('playlist')
-      .where(`playlist.userId= :userId`, { userId })
-      .leftJoinAndSelect('playlist.tracks', 'track')
-      .loadRelationCountAndMap('playlist.trackCount', 'playlist.tracks')
-      .orderBy('track.createdAt', 'DESC')
+      .where('playlist.userId= :userId', { userId })
+      .leftJoinAndSelect('playlist.playlistTrack', 'playlistTrack')
+      .leftJoinAndSelect('playlistTrack.track', 'track')
+      .loadRelationCountAndMap('playlist.trackCount', 'playlist.playlistTrack')
+      .orderBy('playlistTrack.createdAt', 'DESC')
       .getOne();
 
     const { durationSum } = await this.playlistRepository
       .createQueryBuilder('playlist')
       .where(`playlist.userId= :userId`, { userId })
-      .leftJoin('playlist.tracks', 'tracks')
-      .select('SUM(tracks.duration)', 'durationSum')
+      .leftJoin('playlist.playlistTrack', 'playlistTrack')
+      .leftJoin('playlistTrack.track', 'track')
+      .select('SUM(track.duration)', 'durationSum')
       .getRawOne();
 
-    return { ...playlist, durationSum };
+    const mappedResult = {
+      ...playlist,
+      tracks: playlist?.playlistTrack.map((playlistTrack) => ({
+        ...playlistTrack.track,
+        id: playlistTrack.track.id,
+        playlistTrackId: playlistTrack.id,
+        trackCreatedAt: playlistTrack.track.createdAt,
+        createdAt: playlistTrack.createdAt,
+      })),
+      durationSum,
+    };
+    delete mappedResult.playlistTrack;
+    return mappedResult;
   }
 }
