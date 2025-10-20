@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectS3, S3 } from 'nestjs-s3';
 import { Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { ClientKafka } from '@nestjs/microservices';
 import { UserService } from 'src/user/user.service';
 import { validateURL } from '@distube/ytdl-core';
 import { Playlist } from './entities/playlist.entity';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { ETrackStatuses } from './entities/trackStatuses';
 import { PlaylistTrack } from './entities/playlist-track.entity';
 
@@ -22,17 +19,20 @@ export class TrackPlaylistService implements OnModuleInit {
     @InjectRepository(Track)
     private readonly trackRepository: Repository<Track>,
     @InjectRepository(PlaylistTrack)
-    private readonly playlistTrackRepository: Repository<Playlist>,
+    private readonly playlistTrackRepository: Repository<PlaylistTrack>,
     @Inject('KAFKA_SERVICE') private readonly client: ClientKafka,
     @Inject() private readonly userService: UserService,
-    @InjectS3() private readonly s3: S3,
   ) {}
 
   async onModuleInit() {
     await this.client.connect();
   }
 
-  async uploadTrack(link: string, user: { id: string; email: string }) {
+  async uploadTrack(
+    link: string,
+    playlistId: string,
+    user: { id: string; email: string },
+  ) {
     const isValidYTLink = validateURL(link);
     if (!isValidYTLink) {
       return {
@@ -47,11 +47,36 @@ export class TrackPlaylistService implements OnModuleInit {
       where: { videoId },
     });
 
-    if (alreadyExists) {
-      return alreadyExists;
+    const playlist = await this.playlistRepository.findOne({
+      where: { id: playlistId },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (!playlist) {
+      return { error: "Playlist doesn't exist" };
     }
 
-    const foundUser = await this.userService.findOneById(user.id);
+    if (playlist.user.id !== user.id) {
+      return "You're not the owner of the given playlist";
+    }
+
+    if (alreadyExists) {
+      const playlistTrack = await this.playlistTrackRepository
+        .createQueryBuilder('playlistTrack')
+        .where('playlistTrack.trackId= :trackId', {
+          trackId: alreadyExists.id,
+        })
+        .andWhere('playlistTrack.playlistId= :playlistId', {
+          playlistId,
+        })
+        .getOne();
+
+      if (playlistTrack) {
+        return { error: 'The track is already added to that playlist' };
+      }
+    }
 
     const newTrack = this.trackRepository.create({
       status: ETrackStatuses.Started,
@@ -60,7 +85,7 @@ export class TrackPlaylistService implements OnModuleInit {
 
     const savedTrack = await this.trackRepository.save(newTrack);
 
-    await this.addTrackToPlaylist(foundUser?.favouriteTracks!, savedTrack);
+    await this.addTrackToPlaylist(playlist, savedTrack);
 
     const newTrackInfo = {
       link,
@@ -84,28 +109,6 @@ export class TrackPlaylistService implements OnModuleInit {
     duration?: number,
   ) {
     return this.trackRepository.update({ id }, { status, name, duration });
-  }
-
-  async downloadTrackM3U8ById(id: string) {
-    const res = await this.s3.getObject({
-      Bucket: 'tsap-tsarap-bucket',
-      Key: `${id}/${id}.m3u8`,
-    });
-
-    const m3u8String = await res.Body?.transformToString('utf-8')!;
-    const pattern = id + '_segment\\d{3}\\.ts';
-
-    const segments = Array.from(m3u8String.matchAll(new RegExp(pattern, 'g')));
-    let newM3U8String = m3u8String;
-    for (const segment of segments) {
-      const command = new GetObjectCommand({
-        Bucket: 'tsap-tsarap-bucket',
-        Key: `${id}/${segment[0]}`,
-      });
-      const url = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
-      newM3U8String = newM3U8String.replace(segment[0], url);
-    }
-    return newM3U8String;
   }
 
   async createPlaylist(name: string, email?: string) {

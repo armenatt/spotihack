@@ -33,12 +33,11 @@ export class TrackPlaylistController {
     @Req() req: { user: { id: string; email: string } },
     @Body() payload: UploadTrackDto,
   ) {
-    return this.trackPlaylistService.uploadTrack(payload.link, req.user);
-  }
-  @UseGuards(AuthGuard)
-  @Get('track/:id')
-  getTrackById(@Param() params: { id: string }) {
-    return this.trackPlaylistService.downloadTrackM3U8ById(params.id);
+    return this.trackPlaylistService.uploadTrack(
+      payload.link,
+      payload.playlistId,
+      req.user,
+    );
   }
 
   @UseGuards(AuthGuard)

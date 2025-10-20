@@ -22,6 +22,7 @@ export class UserService {
         favouriteTracks: {
           playlistTrack: true,
         },
+        playlists: true,
       },
     });
   }

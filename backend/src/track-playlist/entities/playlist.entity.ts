@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PlaylistTrack } from './playlist-track.entity';
+import { EPlaylistType } from './playlistType';
 
 @Entity()
 export class Playlist {
@@ -23,6 +24,9 @@ export class Playlist {
 
   @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.playlist)
   playlistTrack: PlaylistTrack[];
+
+  @Column({ default: EPlaylistType.Private })
+  type: EPlaylistType;
 
   @CreateDateColumn()
   createdAt: Date;
