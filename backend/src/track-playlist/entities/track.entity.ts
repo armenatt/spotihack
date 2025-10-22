@@ -23,10 +23,12 @@ export class Track {
   status: ETrackStatuses;
   @Column({ nullable: true })
   duration: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true })
   videoId: string;
 
-  @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.track)
+  @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.track, {
+    onDelete: 'CASCADE',
+  })
   playlistTrack: PlaylistTrack[];
 
   m3u8Raw: string;

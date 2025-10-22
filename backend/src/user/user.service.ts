@@ -19,9 +19,6 @@ export class UserService {
     return this.userRepository.findOne({
       where: { id },
       relations: {
-        favouriteTracks: {
-          playlistTrack: true,
-        },
         playlists: true,
       },
     });
@@ -43,7 +40,7 @@ export class UserService {
       email,
       username,
       password: hash,
-      favouriteTracks: playlist,
+      playlists: [playlist],
     });
 
     return this.userRepository.save(newUser);

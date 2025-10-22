@@ -1,12 +1,5 @@
 import { Playlist } from 'src/track-playlist/entities/playlist.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -24,10 +17,10 @@ export class User {
 
   @Column()
   password: string;
-  @OneToOne(() => Playlist, (playlist) => playlist.user)
-  @JoinColumn()
-  favouriteTracks: Playlist;
 
-  @OneToMany(() => Playlist, (playlist) => playlist.user, { cascade: true })
+  @OneToMany(() => Playlist, (playlist) => playlist.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   playlists: Playlist[];
 }

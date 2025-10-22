@@ -55,8 +55,9 @@ export class AuthService {
       throw new BadRequestException('Email already exists');
     }
 
-    const newPlaylist =
-      await this.trackPlaylistService.createPlaylist('favourite');
+    const newPlaylist = await this.trackPlaylistService.createPlaylist({
+      favourite: true,
+    });
 
     const newUser = await this.userService.createUser(
       registerDto.email,

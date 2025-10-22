@@ -22,12 +22,6 @@ export class TrackPlaylistController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Get('user/favourite-tracks')
-  getUserFavouriteTracks(@Req() req: { user: { id: string } }) {
-    return this.trackPlaylistService.getFavouriteTracks(req.user.id);
-  }
-
-  @UseGuards(AuthGuard)
   @Post('track/upload')
   uploadTrack(
     @Req() req: { user: { id: string; email: string } },
@@ -43,16 +37,25 @@ export class TrackPlaylistController {
   @UseGuards(AuthGuard)
   @Post('/playlist/create')
   createPlaylist(
-    @Req() req: { user: { email: string } },
+    @Req() req: { user: { id: string } },
     @Body() body: { name: string },
   ) {
-    return this.trackPlaylistService.createPlaylist(body.name, req.user.email);
+    return this.trackPlaylistService.createPlaylist({
+      name: body.name,
+      id: req.user.id,
+    });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/playlists')
+  getPlaylists(@Req() req: { user: { id: string } }) {
+    return this.trackPlaylistService.getPlaylistList(req.user.id);
   }
 
   @UseGuards(AuthGuard)
   @Get('playlist/:id')
   getPlaylist(@Param('id') id: string) {
-    return this.trackPlaylistService.getPlaylistById(id);
+    return this.trackPlaylistService.getPlaylistWithTracksById(id);
   }
 
   @UseGuards(AuthGuard)

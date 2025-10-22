@@ -5,7 +5,6 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PlaylistTrack } from './playlist-track.entity';
@@ -15,18 +14,19 @@ import { EPlaylistType } from './playlistType';
 export class Playlist {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
-  name: string;
+  @Column({ nullable: true })
+  name?: string;
   @ManyToOne(() => User, (user) => user.playlists)
   user: User;
-  @OneToOne(() => User, (user) => user.favouriteTracks)
-  favouritedBy: User;
 
   @OneToMany(() => PlaylistTrack, (playlistTrack) => playlistTrack.playlist)
   playlistTrack: PlaylistTrack[];
 
   @Column({ default: EPlaylistType.Private })
   type: EPlaylistType;
+
+  @Column({ default: false })
+  favourite?: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

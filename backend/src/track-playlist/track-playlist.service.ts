@@ -51,6 +51,7 @@ export class TrackPlaylistService implements OnModuleInit {
       where: { id: playlistId },
       relations: {
         user: true,
+        playlistTrack: true,
       },
     });
 
@@ -75,6 +76,8 @@ export class TrackPlaylistService implements OnModuleInit {
 
       if (playlistTrack) {
         return { error: 'The track is already added to that playlist' };
+      } else {
+        return this.addTrackToPlaylist(playlist, alreadyExists);
       }
     }
 
@@ -111,10 +114,18 @@ export class TrackPlaylistService implements OnModuleInit {
     return this.trackRepository.update({ id }, { status, name, duration });
   }
 
-  async createPlaylist(name: string, email?: string) {
-    const newPlaylist = this.playlistRepository.create({ name });
-    if (email) {
-      const user = await this.userService.findOneByEmail(email);
+  async createPlaylist({
+    name,
+    id,
+    favourite,
+  }: {
+    name?: string;
+    id?: string;
+    favourite?: boolean;
+  }) {
+    const newPlaylist = this.playlistRepository.create({ name, favourite });
+    if (id) {
+      const user = await this.userService.findOneById(id);
       newPlaylist.user = user!;
     }
     return this.playlistRepository.save(newPlaylist);
@@ -147,20 +158,29 @@ export class TrackPlaylistService implements OnModuleInit {
   }
 
   async addTrackToPlaylist(playlist: Playlist, track: Track) {
-    const playlistTrack = new PlaylistTrack();
-
-    playlistTrack.track = track;
-    playlistTrack.playlist = playlist;
-
+    const playlistTrack = this.playlistTrackRepository.create({
+      track,
+      playlist,
+    });
     playlist.playlistTrack.push(playlistTrack);
     await this.playlistTrackRepository.save(playlistTrack);
     return this.playlistRepository.save(playlist);
   }
 
-  async getFavouriteTracks(userId: string) {
-    const playlist = await this.playlistRepository
+  async getPlaylistList(userId: string) {
+    const playlists = await this.playlistRepository
       .createQueryBuilder('playlist')
       .where('playlist.userId= :userId', { userId })
+      .loadRelationCountAndMap('playlist.trackCount', 'playlist.playlistTrack')
+      .getMany();
+
+    return playlists;
+  }
+
+  async getPlaylistWithTracksById(playlistId: string) {
+    const playlist = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .where('playlist.id= :id', { id: playlistId })
       .leftJoinAndSelect('playlist.playlistTrack', 'playlistTrack')
       .leftJoinAndSelect('playlistTrack.track', 'track')
       .loadRelationCountAndMap('playlist.trackCount', 'playlist.playlistTrack')
@@ -169,7 +189,7 @@ export class TrackPlaylistService implements OnModuleInit {
 
     const { durationSum } = await this.playlistRepository
       .createQueryBuilder('playlist')
-      .where(`playlist.userId= :userId`, { userId })
+      .where(`playlist.id= :id`, { id: playlistId })
       .leftJoin('playlist.playlistTrack', 'playlistTrack')
       .leftJoin('playlistTrack.track', 'track')
       .select('SUM(track.duration)', 'durationSum')
