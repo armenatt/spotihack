@@ -1,10 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { validateURL } from '@distube/ytdl-core';
 import { existsSync, mkdirSync } from 'fs';
 import { UploadTrackDto } from './dtos/upload-track-dto';
 import { ETrackStatuses } from './trackStatuses';
+import { rm } from 'fs/promises';
+import { validateURL } from '@distube/ytdl-core';
 
 @Controller()
 export class AppController {
@@ -22,18 +23,24 @@ export class AppController {
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Downloading,
     });
-    console.log('info', 'Downloading');
-    const result = await this.appService.getVideoReadableStream(message.link);
+    console.log('info', 'Getting Info');
+
+    const result = await this.appService.getVideoInfo(message.link);
+
     if (!result) {
-      return;
+      return 'Not found';
     }
+    console.log('info', 'Downloading');
+
+    await this.appService.downloadAudio(message.link, message.id);
+
     console.log('info', 'Finished downloading');
 
     const targetDir = `${process.cwd()}/targetFolder/${message.id}/`;
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Downloading,
-      name: result.info.title,
-      duration: result.info.duration,
+      name: result.title,
+      duration: result.duration,
     });
     if (!existsSync(targetDir)) {
       mkdirSync(targetDir);
@@ -42,11 +49,10 @@ export class AppController {
     await this.appService.updateTrackStatus(message.id, {
       status: ETrackStatuses.Processing,
     });
-    await this.appService.convertAudioToHls(
-      result.audio,
-      message.id,
-      targetDir,
-    );
+    const audioPath =
+      process.cwd() + '/targetFolder/temp/' + message.id + '.mp3';
+    await this.appService.convertAudioToHls(audioPath, message.id, targetDir);
+    await rm(audioPath, { force: true });
     console.log('info', 'Finished converting');
 
     console.log('info', 'Uploading');

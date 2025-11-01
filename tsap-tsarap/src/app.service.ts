@@ -1,68 +1,59 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { Innertube } from 'youtubei.js';
 import getMinutes from './utils/getMinutes';
 import * as Ffmpeg from 'fluent-ffmpeg';
-import Stream, { Readable } from 'node:stream';
 import { InjectS3, S3 } from 'nestjs-s3';
-import { createReadStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { readdir, rm } from 'node:fs/promises';
 import promisifyCommand from './utils/promisifyCommand';
-import { ConfigService } from '@nestjs/config';
 import { ETrackStatuses } from './trackStatuses';
 import { ClientKafka } from '@nestjs/microservices';
+import { YtDlp } from 'ytdlp-nodejs';
+import { getBasicInfo } from '@distube/ytdl-core';
 
 @Injectable()
 export class AppService implements OnModuleInit {
+  private ytdlp = new YtDlp({
+    binaryPath: '/usr/local/yt-dlp/yt-dlp',
+    ffmpegPath: '/usr/bin/ffmpeg',
+  });
   constructor(
     @InjectS3() private readonly s3: S3,
     @Inject('KAFKA_SERVICE') private readonly kafkaService: ClientKafka,
-    private configService: ConfigService,
   ) {}
 
   async onModuleInit() {
     await this.kafkaService.connect();
   }
 
-  async getVideoReadableStream(link: string) {
+  async getVideoInfo(link: string) {
     const id = new URLSearchParams(new URL(link).searchParams).get('v');
+    const info = await getBasicInfo(id!);
 
-    const instance = await Innertube.create({
-      player_id: '0004de42',
-    });
-    console.log(id);
-
-    const info = await instance.getBasicInfo(id!);
-    const audio = await info.download();
-
-    // const agent = createAgent();
-    // let info;
-    // try {
-    //   info = await getInfo(link, { agent });
-    // } catch (error) {
-    //   console.log(error);
-    //   return;
-    // }
-
-    if (getMinutes(Number(info.basic_info.duration)) > 10) {
-      console.log('More than 10 minutes');
-      return;
+    if (Number(info.videoDetails.lengthSeconds) / 60 > 10) {
+      throw new Error('Video duration exceeds 10 minutes');
     }
 
-    // const audio = downloadFromInfo(info, { filter: 'audioonly', agent });
     return {
-      audio: Readable.from(audio),
-      info: info.basic_info,
+      title: info.videoDetails.title,
+      duration: parseInt(info.videoDetails.lengthSeconds),
     };
   }
 
-  async convertAudioToHls(
-    input: string | Stream.Readable,
-    id: string,
-    targetPath: string,
-  ) {
-    console.log(input);
+  async downloadAudio(link: string, id: string) {
+    const writeStream = createWriteStream(
+      process.cwd() + '/targetFolder/temp/' + id + '.mp3',
+    );
+    const videoId = new URLSearchParams(new URL(link).searchParams).get('v');
 
+    const result = this.ytdlp.stream(videoId!, {
+      format: { filter: 'audioonly', quality: 10 },
+    });
+
+    await result.pipeAsync(writeStream);
+  }
+
+  async convertAudioToHls(input: string, id: string, targetPath: string) {
     const command = Ffmpeg(input);
     command
       .addOutputOption('-f segment')

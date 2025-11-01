@@ -5,6 +5,12 @@ WORKDIR /usr/local/src
 RUN apt-get upgrade && apt-get update
 RUN apt-get install ffmpeg -y
 
+RUN mkdir /usr/local/yt-dlp
+WORKDIR /usr/local/yt-dlp
+
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/yt-dlp/yt-dlp
+RUN chmod a+rx /usr/local/yt-dlp/yt-dlp
+
 # Custom Builds go here
 RUN ffmpeg -version
 # =================================
