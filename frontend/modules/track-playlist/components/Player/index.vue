@@ -1,5 +1,5 @@
 <template>
-  <div class="player">
+  <div class="player" @keyboard.space="playing ? pause() : play()">
     <audio ref="audio" class="play__audio"></audio>
     <div class="player__left">
       <div class="player__track-name">
@@ -44,15 +44,7 @@
         <ProgressBar
           v-model="normalizedTime"
           @mousepressed="mouseDown = true"
-          @mousereleased="
-            () => {
-              if (mouseDown) {
-
-                audio!.currentTime = currentTime
-              }
-              mouseDown = false;
-            }
-          "
+          @mousereleased="onMouseReleased"
         />
         <div v-if="track" class="player__time-end">
           {{ getTimeFromSeconds(track?.duration) }}
@@ -103,6 +95,7 @@ const normalizedTime = computed({
   },
   set(value) {
     currentTime.value = (value / 100) * (props.track?.duration ?? 1);
+    // currentTime.value = value;
   },
 });
 
@@ -142,6 +135,12 @@ watch(
 
 onMounted(() => {
   audio.value!.ontimeupdate = computedFunc.value;
+  audio.value!.onpause = () => {
+    emit("pause");
+  };
+  audio.value!.onplay = () => {
+    emit("play");
+  };
 });
 
 const computedFunc = computed(() => {
@@ -191,13 +190,20 @@ const onPrev = () => {
   }
   emit("prev");
 };
+
+const onMouseReleased = () => {
+  if (mouseDown.value) {
+    audio.value!.currentTime = currentTime.value;
+  }
+  mouseDown.value = false;
+};
 </script>
 
 <style lang="scss">
 .player {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  justify-content: space-between;
+  // justify-content: space-between;
   align-items: center;
   font-family: "Avenir Next", sans-serif;
   padding-left: 8px;

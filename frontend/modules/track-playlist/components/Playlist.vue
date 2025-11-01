@@ -11,18 +11,20 @@
       </div>
       <div class="playlist__bottom">
         <div class="playlist__author-name">
-          {{ username }}<span>'s playlist,</span>
+          {{ username }}<span>'s playlist</span>
         </div>
-        <div class="playlist__number-of-songs">{{ numberOfSongs }},</div>
-        <div class="playlist__duration">{{ duration }}</div>
+        <template v-if="playlist.trackCount">
+          <div class="playlist__number-of-songs">{{ numberOfSongs }},</div>
+          <div class="playlist__duration">{{ duration }}</div>
+        </template>
       </div>
     </div>
 
     <div class="playlist__dither"></div>
-    <div class="playlist__buttons">
+    <div v-if="playlist.trackCount" class="playlist__buttons">
       <SButton
         class="playlist__play-button"
-        :icon="playing ? 'pause' : 'play'"
+        :icon="playing && playlist.id === currentPlaylistId ? 'pause' : 'play'"
         icon-only
         :icon-size="25"
         @click="emit('playPlaylist')"
@@ -43,14 +45,20 @@
       />
       <!-- <SInput /> -->
     </div>
-    <div class="playlist__table">
+    <div v-if="playlist.trackCount" class="playlist__table">
       <TrackTable :headers="headers">
         <Track
           v-for="(track, index) in playlist.tracks"
           favourite-playlist
           :track="track"
-          :choosen="currentTrack?.id === track.id"
-          :playing="playing && currentTrack?.id === track.id"
+          :choosen="
+            currentTrack?.id === track.id && playlist.id === currentPlaylistId
+          "
+          :playing="
+            playing &&
+            currentTrack?.id === track.id &&
+            playlist.id === currentPlaylistId
+          "
           :index="index"
           @click="onClickOnTrack(track)"
         />
@@ -70,6 +78,7 @@ const props = defineProps<{
   username: string;
   playlist: TPlaylist;
   currentTrack?: TTrack;
+  currentPlaylistId?: string;
   playing: boolean;
   favouritePlaylist?: boolean;
 }>();
@@ -84,7 +93,11 @@ const headers = [
 const duration = computed(() => {
   const minutes = Math.round(props.playlist.durationSum / 60);
   const hours = Math.round(minutes / 60);
+  const seconds = minutes % 60;
 
+  if (hours < 1) {
+    return `${minutes} min ${seconds < 10 ? "0" : ""}${seconds} seconds`;
+  }
   return `${hours}hr ${minutes % 60 < 10 ? "0" : ""}${minutes % 60} min`;
 });
 
@@ -107,12 +120,30 @@ const onClickOnTrack = (track: TTrack) => {
   padding-right: 40px;
   position: relative;
   z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    background: transparent;
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(#b3b3b3, 0.5);
+    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(#b3b3b3, 0.8);
+  }
 
   &__dither {
     height: 300px;
-    width: 100%;
+    width: calc(100% + 10px);
     position: absolute;
-    left: 0;
+    // left: 0;
+    right: -10px;
     isolation: isolate;
     z-index: -1;
     background: rgba(18, 18, 18, 30%);

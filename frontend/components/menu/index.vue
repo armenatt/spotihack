@@ -1,83 +1,48 @@
 <template>
   <div class="menu">
     <nav class="menu__nav">
-      <div class="menu__primary-nav">
-        <PrimaryNavItem
-          v-for="item in primaryItems"
-          :label="item.label"
-          :icon="item.icon"
-          :to="item.to"
-          :icon-active="item.iconActive"
-        />
+      <PlaylistItem
+        v-for="item in props?.secondaryItems"
+        :title="item.favourite ? 'Favourite tracks' : item.name"
+        :playlist="item"
+        :selected="true"
+      />
+      <div v-if="!props.secondaryItems?.length" class="menu__empty">
+        NET NICHEGO
       </div>
-      <div class="menu__secondary-nav">
-        <!-- <SecondaryNavItem
-          v-for="item in props?.secondaryItems"
-          :title="item.title"
-          :subtitle="item.subtitle"
-          :selected="item.selected"
-        /> -->
-        <div v-if="!props.secondaryItems?.length" class="menu__empty">
-          NET NICHEGO
-        </div>
-      </div>
+      <!-- </div> -->
     </nav>
   </div>
 </template>
 
 <script setup lang="ts">
-import PrimaryNavItem from "./PrimaryNavItem.vue";
-import SecondaryNavItem from "./SecondaryNavItem.vue";
+import PlaylistItem from "./PlaylistItem.vue";
+import type { TPlaylist } from "~/modules/track-playlist/entities";
 
 const props = defineProps<{
-  secondaryItems?: any[];
+  secondaryItems?: TPlaylist[];
 }>();
-
-const primaryItems = ref([
-  {
-    label: "Home",
-    icon: "home-outline",
-    iconActive: "home",
-    to: "/",
-  },
-  // {
-  //   label: "Search",
-  //   icon: "search",
-  //   iconActive: "search-fill",
-  //   to: "/search",
-  // },
-  {
-    label: "Profile",
-    icon: "profile-outline",
-    iconActive: "profile-fill",
-    to: "/profile",
-  },
-  {
-    label: "Playlists",
-    icon: "playlist",
-    iconActive: "playlist-fill",
-    to: "/playlists",
-  },
-  {
-    label: "Favourite Tracks",
-    icon: "favourite",
-    iconActive: "favourite-fill",
-    to: "/tracks",
-  },
-]);
 </script>
 
 <style lang="scss">
 .menu {
   resize: horizontal;
   width: 420px;
+  grid-area: menu;
 
   &__nav {
+    scrollbar-width: none;
     display: flex;
     flex-direction: column;
     height: 100%;
     gap: 8px;
     align-items: stretch;
+
+    background-color: var(--blackish);
+    padding: 8px;
+    border-radius: 10px;
+    height: 100%;
+    overflow-y: scroll;
   }
 
   &__primary-nav {
@@ -97,11 +62,6 @@ const primaryItems = ref([
   }
 
   &__secondary-nav {
-    background-color: var(--blackish);
-    padding: 8px 12px;
-    border-radius: 10px;
-    height: 80vh;
-    overflow-y: scroll;
   }
 
   &__empty {

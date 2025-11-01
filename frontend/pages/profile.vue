@@ -1,7 +1,6 @@
 <template>
   <div class="profile-page">
     <pre>
-
       {{ user }}
     </pre>
   </div>

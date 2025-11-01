@@ -1,7 +1,11 @@
 import axios from "axios";
 
 export class TrackPlaylistApi {
-  getFavouriteTracks() {
-    return axios.get("/user/favourite-tracks");
+  getPlaylistList() {
+    return axios.get("/playlists");
+  }
+
+  getPlaylistById(id: string) {
+    return axios.get("/playlist/" + id);
   }
 }

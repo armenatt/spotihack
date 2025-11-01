@@ -1,7 +1,17 @@
 <template>
   <div class="default-layout">
-    <div class="default-layout__top">
-      <Menu />
+    <div class="default-layout__header">
+      <SButton
+        iconOnly
+        icon="profile-outline"
+        :iconSize="30"
+        type="text"
+        iconColor="white"
+        @click="navigateTo('/profile')"
+      />
+    </div>
+    <div class="default-layout__center">
+      <Menu :secondaryItems="playlists" />
       <div class="default-layout__content">
         <NuxtPage />
       </div>
@@ -25,10 +35,13 @@
 <script setup lang="ts">
 import { Player } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
+import type { TPlaylist } from "~/modules/track-playlist/entities";
 
 const { $services } = useNuxtApp();
 
-await $services.trackPlaylistService.getFavouriteTracks();
+const playlists = ref<TPlaylist[]>();
+
+playlists.value = await $services.trackPlaylistService.getPlaylistList();
 
 const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
   storeToRefs(useTrackPlaylistStore());
@@ -38,7 +51,7 @@ const nextTrack = computed(() => {
     (track) => track.id === currentlyPlayingTrack.value?.id
   );
 
-  if (index === -1) {
+  if (index < 0) {
     return undefined;
   }
   return currentlyPlayingPlaylist.value?.tracks[index + 1];
@@ -49,14 +62,10 @@ const prevTrack = computed(() => {
     (track) => track.id === currentlyPlayingTrack.value?.id
   );
 
-  if (index === -1) {
+  if (index === -1 || !index) {
     return undefined;
   }
   return currentlyPlayingPlaylist.value?.tracks[index - 1];
-});
-
-const disablePrev = computed(() => {
-  return !nextTrack.value;
 });
 
 const onTrackEnded = () => {
@@ -74,28 +83,40 @@ const onPrev = () => {
 
 <style lang="scss">
 .default-layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  // flex-direction: column;
   background-color: black;
+  min-height: 100vh;
   height: 100vh;
+  grid-template-areas:
+    "header header header"
+    "center center center"
+    "player player player";
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
 
-  &__top {
+  &__header {
+    min-height: 64px;
+    grid-area: header;
+  }
+
+  &__center {
     display: flex;
-    padding: 8px 8px 0;
+    padding: 0 8px;
     gap: 8px;
     overflow-y: auto;
+    grid-area: center;
   }
 
   &__player {
     min-height: 88px;
+    grid-area: player;
   }
 
   &__content {
-    display: flex;
     width: 100%;
     background-color: var(--blackish);
-    // padding: 14px;
-    overflow-y: auto;
+    overflow-y: hidden;
     border-radius: 10px;
     color: var(--white);
   }
