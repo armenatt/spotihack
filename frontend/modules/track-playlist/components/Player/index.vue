@@ -38,17 +38,31 @@
         />
       </div>
       <div class="player__seek">
-        <div v-if="track" class="player__time-start">
+        <div v-if="track" class="player__time">
           {{ getTimeFromSeconds(Math.floor(currentTime)) }}
         </div>
+        <div v-else class="player__time">--:--</div>
         <ProgressBar
           v-model="normalizedTime"
+          :disabled="!track"
           @mousepressed="mouseDown = true"
           @mousereleased="onMouseReleased"
         />
-        <div v-if="track" class="player__time-end">
+        <div
+          v-if="track && !flippedTime"
+          class="player__time"
+          @click="flippedTime = !flippedTime"
+        >
           {{ getTimeFromSeconds(track?.duration) }}
         </div>
+        <div
+          v-else-if="flippedTime && track"
+          class="player__time"
+          @click="flippedTime = !flippedTime"
+        >
+          -{{ getTimeFromSeconds(track?.duration - Math.floor(currentTime)) }}
+        </div>
+        <div v-else class="player__time">--:--</div>
       </div>
     </div>
     <div class="player__end">
@@ -84,6 +98,7 @@ const props = defineProps<{
 const currentTime = ref(0);
 const volume = ref(localStorage.volume || 100);
 const mouseDown = ref(false);
+const flippedTime = ref(localStorage.flippedTime || false);
 
 const link = computed(() => {
   return `${rc.public.cdnURL}/storage/${props.track?.id}/${props.track?.id}.m3u8`;
@@ -221,6 +236,13 @@ const onMouseReleased = () => {
     align-items: center;
     font-size: 12px;
     color: var(--grey);
+  }
+
+  &__time {
+    white-space: nowrap;
+    cursor: default;
+    user-select: none;
+    width: 40px;
   }
 
   &__audio {
