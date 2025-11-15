@@ -1,14 +1,19 @@
 <template>
-  <div class="progress-bar" ref="progressBar" @mousedown="onClick">
+  <div
+    :class="{ 'progress-bar': true, 'progress-bar--disabled': disabled }"
+    ref="progressBar"
+    @mousedown="onClick"
+  >
     <div class="progress-bar__background"></div>
     <div
+      v-if="!disabled"
       class="progress-bar__active"
       :style="{
         width: activeWidth + 'px',
         background: mouseDown ? 'var(--green)' : '',
       }"
     >
-      <div class="progress-bar__thumb"></div>
+      <div v-if="!disabled" class="progress-bar__thumb"></div>
     </div>
   </div>
 </template>
@@ -25,6 +30,10 @@ const percentage = defineModel<number>({
 const progressBarWidth = ref(0);
 const mouseDown = ref(false);
 const mousePosition = ref();
+
+const props = defineProps<{
+  disabled?: boolean;
+}>();
 
 const observer = new ResizeObserver(() => {
   progressBarWidth.value =
@@ -78,6 +87,7 @@ window.addEventListener("mousemove", (event) => {
 });
 
 const onClick = (event: MouseEvent) => {
+  if (props.disabled) return;
   mouseDown.value = true;
   emit("mousepressed");
   percentage.value = calculateDirectionAndDiff(event);
@@ -107,7 +117,8 @@ watch(
   width: 100%;
   position: relative;
   border-radius: 50%;
-  cursor: x;
+  cursor: pointer;
+
   &:hover {
     #{$self}__active {
       background-color: var(--green);
@@ -115,6 +126,11 @@ watch(
     #{$self}__thumb {
       display: block;
     }
+  }
+
+  &--disabled {
+    user-select: none;
+    pointer-events: none;
   }
 
   &__background {
@@ -140,9 +156,9 @@ watch(
     display: none;
     position: absolute;
     right: -5px;
-    bottom: -3px;
-    height: 10px;
-    width: 10px;
+    bottom: -4px;
+    height: 12px;
+    width: 12px;
     background-color: var(--white);
     border-radius: 50%;
   }
