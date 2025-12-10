@@ -36,13 +36,21 @@
         icon-only
         :icon-size="40"
       />
-      <SButton
-        icon="add-track"
-        type="text"
-        icon-color="white"
-        icon-only
-        :icon-size="40"
-      />
+      <SDropdown>
+        <SDropdownItem text="Prikol??" />
+        <SDropdownItem text="Prikol??" />
+        <SDropdownItem text="Prikol??" />
+        <SDropdownItem text="Prikol??" />
+        <template #target>
+          <SButton
+            icon="add-track"
+            type="text"
+            icon-color="white"
+            icon-only
+            :icon-size="40"
+          />
+        </template>
+      </SDropdown>
       <!-- <SInput /> -->
     </div>
     <div v-if="playlist.trackCount" class="playlist__table">
@@ -91,14 +99,14 @@ const headers = [
 ];
 
 const duration = computed(() => {
-  const minutes = Math.round(props.playlist.durationSum / 60);
-  const hours = Math.round(minutes / 60);
-  const seconds = minutes % 60;
+  const minutes = Math.floor(props.playlist.durationSum / 60);
+  const hours = Math.floor(minutes / 60);
+  const seconds = props.playlist.durationSum % 60;
 
   if (hours < 1) {
     return `${minutes} min ${seconds < 10 ? "0" : ""}${seconds} seconds`;
   }
-  return `${hours}hr ${minutes % 60 < 10 ? "0" : ""}${minutes % 60} min`;
+  return `${hours}hr ${seconds < 10 ? "0" : ""}${minutes % 60} min`;
 });
 
 const numberOfSongs = computed(() => {
@@ -113,15 +121,15 @@ const onClickOnTrack = (track: TTrack) => {
 <style lang="scss">
 .playlist {
   height: 100%;
-  background: linear-gradient(#604ec1, #121212 70%);
-  background-repeat: repeat-y;
+  background: linear-gradient(#604ec1, #121212 60%);
   font-family: "Avenir Next", sans-serif;
   padding-left: 40px;
   padding-right: 40px;
   position: relative;
   z-index: 10;
-  overflow-y: auto;
+  overflow-y: overlay;
   overflow-x: hidden;
+  background-attachment: local;
 
   &::-webkit-scrollbar {
     background: transparent;

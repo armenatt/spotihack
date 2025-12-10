@@ -5,7 +5,7 @@
         v-for="item in props?.secondaryItems"
         :title="item.favourite ? 'Favourite tracks' : item.name"
         :playlist="item"
-        :selected="true"
+        :selected="selectedPlaylistId === item.id"
       />
       <div v-if="!props.secondaryItems?.length" class="menu__empty">
         NET NICHEGO
@@ -21,6 +21,7 @@ import type { TPlaylist } from "~/modules/track-playlist/entities";
 
 const props = defineProps<{
   secondaryItems?: TPlaylist[];
+  selectedPlaylistId?: string;
 }>();
 </script>
 

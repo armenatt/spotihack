@@ -13,7 +13,12 @@
       <SButton v-else icon-only icon="music" icon-color="grey" type="text" />
     </div>
     <div class="playlist-item__text">
-      <div class="playlist-item__title">
+      <div
+        :class="{
+          'playlist-item__title': true,
+          'playlist-item__title--selected': selected,
+        }"
+      >
         {{ props.playlist.favourite ? "Favourite tracks" : props.title }}
       </div>
       <slot name="subtitle">
@@ -36,7 +41,8 @@ const props = defineProps<{
   title: string;
   subtitle?: string;
   playlist: TPlaylist;
-  selected: boolean;
+  selected?: boolean;
+  playing?: boolean;
 }>();
 </script>
 
@@ -75,6 +81,10 @@ const props = defineProps<{
     font-size: 16px;
     font-family: "Avenir Next", sans-serif;
     margin-bottom: 5px;
+
+    &--selected {
+      color: var(--green);
+    }
   }
 
   &__subtitle {
