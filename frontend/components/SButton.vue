@@ -132,7 +132,7 @@ const props = withDefaults(
     }
     &:active {
       transform: scale(1);
-      background-color: var(--white-pressed);
+      opacity: 50%;
     }
   }
 

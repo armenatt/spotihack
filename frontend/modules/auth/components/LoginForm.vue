@@ -14,14 +14,21 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "../adapters/store";
+
 const email = ref<string>("");
 const password = ref<string>("");
 const { $services } = useNuxtApp();
 
+const { user } = storeToRefs(useAuthStore());
 const signIn = async () => {
   const result = await $services.authService.login(email.value, password.value);
 
-  navigateTo("/");
+  if (result.data.accessToken) {
+    user.value = result.data;
+    const favPlaylist = user.value.playlists.find((p) => p.favourite);
+    await navigateTo(`/playlist/${favPlaylist?.id}`);
+  }
 };
 </script>
 

@@ -118,7 +118,7 @@ const hls = new Hls({
   xhrSetup(xhr, url) {
     xhr.withCredentials = true;
     xhr.open("GET", url, true);
-    xhr.setRequestHeader("Authorization", `Bearer ${user.value.access_token}`);
+    xhr.setRequestHeader("Authorization", `Bearer ${user.value?.accessToken}`);
   },
 });
 

@@ -36,13 +36,19 @@
         icon-only
         :icon-size="40"
       />
-      <SButton
-        icon="add-track"
-        type="text"
-        icon-color="white"
-        icon-only
-        :icon-size="40"
-      />
+      <SDropdown>
+        <SDropdownItem text="Add video" @click="openAddVideoModal" />
+        <SDropdownItem text="Add playlist" disabled />
+        <template #target>
+          <SButton
+            icon="add-track"
+            type="text"
+            icon-color="white"
+            icon-only
+            :icon-size="40"
+          />
+        </template>
+      </SDropdown>
       <!-- <SInput /> -->
     </div>
     <div v-if="playlist.trackCount" class="playlist__table">
@@ -68,11 +74,15 @@
 </template>
 
 <script setup lang="ts">
+import { useModal } from "vue-final-modal";
 import type { TPlaylist, TTrack } from "../entities";
 import TrackTable from "./TrackTable/index.vue";
 import Track from "./TrackTable/Track.vue";
+import AddPlaylistModal from "./modals/AddPlaylistModal.vue";
 
 const emit = defineEmits(["track", "playPlaylist"]);
+
+const { $services } = useNuxtApp();
 
 const props = defineProps<{
   username: string;
@@ -91,19 +101,50 @@ const headers = [
 ];
 
 const duration = computed(() => {
-  const minutes = Math.round(props.playlist.durationSum / 60);
-  const hours = Math.round(minutes / 60);
-  const seconds = minutes % 60;
+  const minutes = Math.floor(props.playlist.durationSum / 60);
+  const hours = Math.floor(minutes / 60);
+  const seconds = props.playlist.durationSum % 60;
 
   if (hours < 1) {
     return `${minutes} min ${seconds < 10 ? "0" : ""}${seconds} seconds`;
   }
-  return `${hours}hr ${minutes % 60 < 10 ? "0" : ""}${minutes % 60} min`;
+  return `${hours}hr ${seconds < 10 ? "0" : ""}${minutes % 60} min`;
 });
 
 const numberOfSongs = computed(() => {
   return `${props.playlist.trackCount} songs`;
 });
+
+const openAddVideoModal = () => {
+  const { open, close, patchOptions } = useModal({
+    component: AddPlaylistModal,
+    attrs: {
+      onClose() {
+        close();
+      },
+      async onAdd(url: string) {
+        patchOptions({ attrs: { loading: true } });
+        await addTrack(url);
+        patchOptions({ attrs: { loading: false } });
+        close();
+      },
+      loading: false,
+    },
+  });
+  open();
+};
+
+const addTrack = async (url: string) => {
+  try {
+    const result = await $services.trackPlaylistService.addTrack(
+      url,
+      props.playlist.id
+    );
+    props.playlist.tracks.push(result);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 const onClickOnTrack = (track: TTrack) => {
   emit("track", track);
@@ -113,15 +154,15 @@ const onClickOnTrack = (track: TTrack) => {
 <style lang="scss">
 .playlist {
   height: 100%;
-  background: linear-gradient(#604ec1, #121212 70%);
-  background-repeat: repeat-y;
+  background: linear-gradient(#604ec1, #121212 600px);
   font-family: "Avenir Next", sans-serif;
   padding-left: 40px;
   padding-right: 40px;
   position: relative;
   z-index: 10;
-  overflow-y: auto;
+  overflow-y: overlay;
   overflow-x: hidden;
+  background-attachment: local;
 
   &::-webkit-scrollbar {
     background: transparent;
