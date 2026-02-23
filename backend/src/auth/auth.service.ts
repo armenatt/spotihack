@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  Response,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dtos/register-dto';
@@ -12,6 +11,9 @@ import { LoginDto } from './dtos/login-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TrackPlaylistService } from 'src/track-playlist/track-playlist.service';
+import { ConfigService } from '@nestjs/config';
+import { User } from 'src/user/user.entity';
+import { FastifyReply } from 'fastify';
 
 @Injectable()
 export class AuthService {
@@ -19,9 +21,10 @@ export class AuthService {
     @Inject() private readonly userService: UserService,
     @Inject() private readonly trackPlaylistService: TrackPlaylistService,
     @Inject() private readonly jwtService: JwtService,
+    @Inject() private readonly configService: ConfigService,
   ) {}
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, response: FastifyReply) {
     const exists = await this.userService.findOneByEmail(loginDto.email);
 
     if (!exists) {
@@ -34,15 +37,37 @@ export class AuthService {
       throw new UnauthorizedException('Wrong password');
     }
 
+    const accessToken = await this.jwtService.signAsync(
+      {
+        id: exists.id,
+        email: exists.email,
+      },
+      { secret: this.configService.get('SECRET_CODE'), expiresIn: '7d' },
+    );
+
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        id: exists.id,
+        email: exists.email,
+      },
+      { secret: this.configService.get('SECRET_CODE'), expiresIn: '30d' },
+    );
+
+    response.setCookie('authentication', accessToken, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    response.setCookie('refresh', refreshToken, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    });
+
     return {
       ...exists,
-      access_token: await this.jwtService.signAsync(
-        {
-          id: exists.id,
-          email: exists.email,
-        },
-        { secret: 'prikol' },
-      ),
+      password: undefined,
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -71,5 +96,28 @@ export class AuthService {
     await this.trackPlaylistService.updatePlaylist(newPlaylist);
 
     return newUser;
+  }
+
+  async refresh(user: User, response: FastifyReply) {
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        ...user,
+      },
+      { secret: this.configService.getOrThrow('SECRET_CODE') },
+    );
+
+    response.setCookie('authentication', refreshToken, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    response.setCookie('refresh', refreshToken, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    });
+
+    return {
+      accessToken: refreshToken,
+    };
   }
 }

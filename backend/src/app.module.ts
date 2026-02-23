@@ -28,6 +28,7 @@ import { PlaylistTrack } from './track-playlist/entities/playlist-track.entity';
     TrackPlaylistModule,
     AuthModule,
     TrackPlaylistModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [AppService],

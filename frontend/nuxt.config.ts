@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  css: ["~/assets/scss/main.scss"],
+  css: ["~/assets/scss/main.scss", "vue-final-modal/style.css"],
   modules: ["@pinia/nuxt", "nuxt-icons", "pinia-plugin-persistedstate/nuxt"],
   dir: {
     modules: "-",

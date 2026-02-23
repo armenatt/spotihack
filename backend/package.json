@@ -23,6 +23,7 @@
     "@aws-sdk/client-s3": "^3.848.0",
     "@aws-sdk/s3-request-presigner": "^3.850.0",
     "@distube/ytdl-core": "^4.16.12",
+    "@fastify/cookie": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.5",
