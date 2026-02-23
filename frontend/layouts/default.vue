@@ -1,6 +1,6 @@
 <template>
   <div class="default-layout">
-    <div class="default-layout__header">
+    <!-- <div class="default-layout__header">
       <SButton
         iconOnly
         icon="profile-outline"
@@ -9,9 +9,12 @@
         iconColor="white"
         @click="navigateTo('/profile')"
       />
-    </div>
+    </div> -->
     <div class="default-layout__center">
-      <Menu :secondaryItems="playlists" />
+      <Menu
+        :secondaryItems="playlists"
+        :selectedPlaylistId="currentlyPlayingPlaylist?.id"
+      />
       <div class="default-layout__content">
         <NuxtPage />
       </div>
@@ -29,10 +32,12 @@
         @ended="onTrackEnded"
       />
     </div>
+    <ModalsContainer />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ModalsContainer } from "vue-final-modal";
 import { Player } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 import type { TPlaylist } from "~/modules/track-playlist/entities";

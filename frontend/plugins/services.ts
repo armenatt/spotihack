@@ -15,6 +15,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     trackPlaylistApi,
     trackPlaylistStore
   );
+
   return {
     provide: {
       services: {
