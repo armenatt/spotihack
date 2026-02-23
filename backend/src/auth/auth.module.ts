@@ -11,7 +11,7 @@ import { TrackPlaylistModule } from 'src/track-playlist/track-playlist.module';
     TrackPlaylistModule,
     JwtModule.register({
       global: true,
-      secret: 'prikol',
+      secret: process.env.SECRET_CODE,
     }),
   ],
   providers: [AuthService],

@@ -4,10 +4,17 @@ export class TrackPlaylistService {
   constructor(private api: TrackPlaylistApi, private store: any) {}
 
   async getPlaylistList() {
-    return (await this.api.getPlaylistList()).data;
+    const res = await this.api.getPlaylistList();
+    return res.data;
   }
 
   async getPlaylistById(id: string) {
-    return (await this.api.getPlaylistById(id)).data;
+    const res = await this.api.getPlaylistById(id);
+    return res.data;
+  }
+
+  async addTrack(url: string, playlistId: string) {
+    const res = await this.api.addTrack(url, playlistId);
+    return res.data;
   }
 }
