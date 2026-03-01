@@ -7,13 +7,15 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
-    { cors: true },
   );
+  app.enableCors({ credentials: true, origin: 'http://localhost:3001' });
+  app.useWebSocketAdapter(new WsAdapter(app));
 
   await app.register(fastifyCookie, {
     secret: String(process.env.SECRET_CODE),

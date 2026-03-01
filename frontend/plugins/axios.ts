@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
 
   axios.defaults.baseURL = rc.public.baseURL;
   axios.defaults.headers.common.Authorization = `Bearer ${user.value?.accessToken}`;
-
+  axios.defaults.withCredentials = true;
   axios.interceptors.response.use(function onFullfilled(config) {
     return config;
   }, onRejected);

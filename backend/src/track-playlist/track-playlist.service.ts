@@ -10,9 +10,12 @@ import { validateURL } from '@distube/ytdl-core';
 import { Playlist } from './entities/playlist.entity';
 import { ETrackStatuses } from './entities/trackStatuses';
 import { PlaylistTrack } from './entities/playlist-track.entity';
+import { WsUsersService } from 'src/ws-users/ws-users.service';
 
 @Injectable()
 export class TrackPlaylistService implements OnModuleInit {
+  public trackToUserMap: Map<string, string>;
+
   constructor(
     @InjectRepository(Playlist)
     private readonly playlistRepository: Repository<Playlist>,
@@ -22,7 +25,10 @@ export class TrackPlaylistService implements OnModuleInit {
     private readonly playlistTrackRepository: Repository<PlaylistTrack>,
     @Inject('KAFKA_SERVICE') private readonly client: ClientKafka,
     @Inject() private readonly userService: UserService,
-  ) {}
+    @Inject() private readonly wsUserService: WsUsersService,
+  ) {
+    this.trackToUserMap = new Map<string, string>();
+  }
 
   async onModuleInit() {
     await this.client.connect();
@@ -100,9 +106,15 @@ export class TrackPlaylistService implements OnModuleInit {
       messages: [{ key: 'track', value: JSON.stringify(newTrackInfo) }],
     });
 
+    this.addTrackToUserMap(user.id, newTrack.id);
+
     return {
       id: savedTrack.id,
     };
+  }
+
+  addTrackToUserMap(userId: string, trackId: string) {
+    this.trackToUserMap.set(trackId, userId);
   }
 
   async updateTrack(
@@ -111,6 +123,19 @@ export class TrackPlaylistService implements OnModuleInit {
     name?: string,
     duration?: number,
   ) {
+    // TODO: refactor this
+    const userId = this.trackToUserMap.get(id);
+    if (userId) {
+      this.wsUserService.userToSocketMap.get(userId)?.send(
+        JSON.stringify({
+          eventName: 'updateTrack',
+          name,
+          duration,
+          trackId: id,
+          status,
+        }),
+      );
+    }
     return this.trackRepository.update({ id }, { status, name, duration });
   }
 
