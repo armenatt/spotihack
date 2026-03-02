@@ -14,6 +14,7 @@ RUN npm install
 RUN npm run build
 
 COPY . /usr/src/app
+COPY .output ./output
 
 ENV PORT=3001
 CMD [ "node", ".output/server/index.mjs" ]
