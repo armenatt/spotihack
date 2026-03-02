@@ -14,5 +14,5 @@ RUN npm install
 COPY . /usr/src/app
 
 
-EXPOSE 3000
+ENV PORT=3001
 CMD [ "node", ".output/server/index.mjs" ]
