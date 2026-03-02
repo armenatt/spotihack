@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     public: {
       baseURL: process.env.BASE_URL,
       cdnURL: process.env.CDN_URL,
+      wsURL: process.env.WS_URL,
     },
   },
 });

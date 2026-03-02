@@ -80,7 +80,7 @@ const { $services } = useNuxtApp();
 const ws = ref<WebSocket>();
 
 onMounted(() => {
-  const websocket = new WebSocket("ws://localhost:3000/ws");
+  const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
   ws.value = websocket;
 
   ws.value.onmessage = (event) => {

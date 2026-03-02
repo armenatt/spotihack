@@ -8,6 +8,23 @@ volumes:
 
 
 services:
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: always
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    networks:
+      - spotihack-shared-network
+    environment:
+      BASE_URL: ${BASE_URL}
+      CDN_URL: ${CDN_URL}
+      WS_URL: ${WS_URL}
   spotihack:
     container_name: backend
     build: ./backend
@@ -67,6 +84,7 @@ services:
     environment:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      ORIGIN: ${ORIGIN}
     networks:
       - spotihack-shared-network
   garage:
