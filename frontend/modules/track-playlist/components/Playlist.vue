@@ -29,26 +29,19 @@
         :icon-size="25"
         @click="emit('playPlaylist')"
       />
+      <!-- <SDropdown>
+        <SDropdownItem text="Add video" />
+        <SDropdownItem text="Add playlist" disabled />
+        <template #target> </template>
+      </SDropdown> -->
       <SButton
-        icon="download"
+        icon="add-track"
         type="text"
         icon-color="white"
         icon-only
         :icon-size="40"
+        @click="openAddVideoModal"
       />
-      <SDropdown>
-        <SDropdownItem text="Add video" @click="openAddVideoModal" />
-        <SDropdownItem text="Add playlist" disabled />
-        <template #target>
-          <SButton
-            icon="add-track"
-            type="text"
-            icon-color="white"
-            icon-only
-            :icon-size="40"
-          />
-        </template>
-      </SDropdown>
       <!-- <SInput /> -->
     </div>
     <div v-if="playlist.trackCount" class="playlist__table">
