@@ -1,20 +1,14 @@
 FROM node:22
 
-WORKDIR /usr/local/src
-
-RUN apt-get upgrade && apt-get update
-
-#Create app dir
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY package*.json /usr/src/app
+RUN apt-get update && apt-get upgrade -y
+
+COPY package*.json ./
 RUN npm install
 
+COPY . .
 RUN npm run build
 
-COPY . /usr/src/app
-COPY .output ./output
-
 ENV PORT=3001
-CMD [ "node", ".output/server/index.mjs" ]
+CMD ["node", ".output/server/index.mjs"]

@@ -15,7 +15,6 @@ services:
     build: ./frontend
     restart: always
     volumes:
-      - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
       - spotihack
