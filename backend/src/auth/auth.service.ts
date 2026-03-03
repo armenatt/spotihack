@@ -52,6 +52,7 @@ export class AuthService {
       },
       { secret: this.configService.get('SECRET_CODE'), expiresIn: '30d' },
     );
+    console.log('run');
 
     response.setCookie('authentication', accessToken, {
       httpOnly: true,
