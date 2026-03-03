@@ -4,7 +4,11 @@ import { useAuthStore } from "~/modules/auth/adapters/store";
 async function onRejected(response: AxiosResponse) {
   const { user } = storeToRefs(useAuthStore());
   const { $services } = useNuxtApp();
-  if (response.status === 401 && user.value?.accessToken) {
+  if (
+    response.status === 401 &&
+    user.value?.accessToken &&
+    localStorage.authStore
+  ) {
     const result = await $services.authService.refresh();
     user.value.accessToken = result.data.accessToken;
     return await axios(response.config);
