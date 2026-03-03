@@ -3,7 +3,7 @@ import { useAuthStore } from "~/modules/auth/adapters/store";
 export default defineNuxtRouteMiddleware((to) => {
   const { user } = storeToRefs(useAuthStore());
 
-  if (!user.value && to.path !== "/login") {
+  if (!user.value && to.path !== "/login" && to.path !== "/sign-up") {
     return navigateTo("/login");
   }
 });
