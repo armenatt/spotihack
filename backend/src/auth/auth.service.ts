@@ -57,12 +57,14 @@ export class AuthService {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
+      domain: '.spotihack.ru',
     });
 
     response.setCookie('refresh', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       path: '/',
+      domain: '.spotihack.ru',
     });
 
     return {
@@ -111,11 +113,13 @@ export class AuthService {
     response.setCookie('authentication', refreshToken, {
       httpOnly: true,
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      domain: '.spotihack.ru',
     });
 
     response.setCookie('refresh', refreshToken, {
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      domain: '.spotihack.ru',
     });
 
     return {
