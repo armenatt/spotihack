@@ -61,6 +61,7 @@ export class AuthService {
       domain: '.spotihack.ru',
       sameSite: 'none',
       secure: true,
+      signed: true,
     });
 
     response.setCookie('refresh', refreshToken, {
@@ -70,6 +71,7 @@ export class AuthService {
       domain: '.spotihack.ru',
       sameSite: 'none',
       secure: true,
+      signed: true,
     });
 
     return {
@@ -122,6 +124,7 @@ export class AuthService {
       sameSite: 'none',
       secure: true,
       path: '/',
+      signed: true,
     });
 
     response.setCookie('refresh', refreshToken, {
