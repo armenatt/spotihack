@@ -87,8 +87,7 @@ services:
     environment:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
-      ORIGIN: ${ORIGIN}
-      S3_ORIGIN: ${S3_ORIGIN}
+      ORIGIN: https://spotihack.ru
     networks:
       - spotihack-shared-network
   garage:
