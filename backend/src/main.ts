@@ -12,7 +12,7 @@ import { WsAdapter } from '@nestjs/platform-ws';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({ trustProxy: true }),
   );
   app.setGlobalPrefix('api');
   app.enableCors({ credentials: true, origin: process.env.ORIGIN });
