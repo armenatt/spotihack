@@ -1,5 +1,5 @@
 FROM openresty/openresty:alpine-fat
 
-RUN luarocks install lua-resty-jwt
+RUN opm get SkyLothar/lua-resty-jwt
 
 COPY ./nginx/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
