@@ -14,13 +14,13 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({ trustProxy: true }),
   );
-  app.setGlobalPrefix('api');
-  app.enableCors({ credentials: true, origin: process.env.ORIGIN });
-  app.useWebSocketAdapter(new WsAdapter(app));
-
   await app.register(fastifyCookie, {
     secret: String(process.env.SECRET_CODE),
   });
+
+  app.setGlobalPrefix('api');
+  app.enableCors({ credentials: true, origin: process.env.ORIGIN });
+  app.useWebSocketAdapter(new WsAdapter(app));
 
   app.useGlobalPipes(new ValidationPipe());
 
