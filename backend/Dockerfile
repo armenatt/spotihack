@@ -14,9 +14,9 @@ RUN npm install -g @nestjs/cli
 COPY package*.json /usr/src/app
 RUN npm install
 
-RUN npm run build
 #Bundle app source
 COPY . /usr/src/app
+RUN npm run build
 
 
 EXPOSE 3000
