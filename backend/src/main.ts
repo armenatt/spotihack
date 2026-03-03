@@ -14,7 +14,8 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  app.enableCors({ credentials: true, origin: 'http://localhost:3001' });
+  app.setGlobalPrefix('api');
+  app.enableCors({ credentials: true, origin: process.env.ORIGIN });
   app.useWebSocketAdapter(new WsAdapter(app));
 
   await app.register(fastifyCookie, {
