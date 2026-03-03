@@ -21,8 +21,9 @@
     </div>
 
     <div class="playlist__dither"></div>
-    <div v-if="playlist.trackCount" class="playlist__buttons">
+    <div class="playlist__buttons">
       <SButton
+        v-if="playlist.trackCount"
         class="playlist__play-button"
         :icon="playing && playlist.id === currentPlaylistId ? 'pause' : 'play'"
         icon-only
