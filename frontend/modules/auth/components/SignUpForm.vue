@@ -3,6 +3,7 @@
     <h1 class="sign-up__label">Sign Up</h1>
     <SInput v-model="email" label="Email" placeholder="Email" />
     <SInput v-model="name" label="Name" placeholder="Name" />
+    <SInput v-model="username" label="Username" placeholder="Username" />
     <SInput
       v-model="password"
       label="Password"
@@ -23,11 +24,21 @@
 <script setup lang="ts">
 const email = ref("");
 const name = ref("");
+const username = ref("");
 const password = ref("");
 const passwordConfirm = ref("");
 
-const signUp = () => {
-  console.log("sign up");
+const { $services } = useNuxtApp();
+
+const signUp = async () => {
+  await $services.authService.register(
+    name.value,
+    password.value,
+    passwordConfirm.value,
+    username.value,
+    email.value
+  );
+  navigateTo("/login");
 };
 </script>
 
