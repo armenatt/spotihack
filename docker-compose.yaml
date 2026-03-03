@@ -78,6 +78,7 @@ services:
     build: ./openresty/
     container_name: nginx
     ports:
+      - 80:80
       - 443:443
     volumes:
       - ./openresty/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
