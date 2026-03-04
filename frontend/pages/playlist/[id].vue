@@ -20,10 +20,6 @@ import { Playlist } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 import type { TPlaylist, TTrack } from "~/modules/track-playlist/entities";
 
-definePageMeta({
-  middleware: "auth",
-});
-
 const { $services } = useNuxtApp();
 const route = useRoute();
 
