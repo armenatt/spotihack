@@ -21,34 +21,28 @@
     </div>
 
     <div class="playlist__dither"></div>
-    <div v-if="playlist.trackCount" class="playlist__buttons">
+    <div class="playlist__buttons">
       <SButton
+        v-if="playlist.trackCount"
         class="playlist__play-button"
         :icon="playing && playlist.id === currentPlaylistId ? 'pause' : 'play'"
         icon-only
         :icon-size="25"
         @click="emit('playPlaylist')"
       />
+      <!-- <SDropdown>
+        <SDropdownItem text="Add video" />
+        <SDropdownItem text="Add playlist" disabled />
+        <template #target> </template>
+      </SDropdown> -->
       <SButton
-        icon="download"
+        icon="add-track"
         type="text"
         icon-color="white"
         icon-only
         :icon-size="40"
+        @click="openAddVideoModal"
       />
-      <SDropdown>
-        <SDropdownItem text="Add video" @click="openAddVideoModal" />
-        <SDropdownItem text="Add playlist" disabled />
-        <template #target>
-          <SButton
-            icon="add-track"
-            type="text"
-            icon-color="white"
-            icon-only
-            :icon-size="40"
-          />
-        </template>
-      </SDropdown>
       <!-- <SInput /> -->
     </div>
     <div v-if="playlist.trackCount" class="playlist__table">
@@ -83,6 +77,34 @@ import AddPlaylistModal from "./modals/AddPlaylistModal.vue";
 const emit = defineEmits(["track", "playPlaylist"]);
 
 const { $services } = useNuxtApp();
+
+const ws = ref<WebSocket>();
+
+onMounted(() => {
+  const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
+  ws.value = websocket;
+
+  ws.value.onmessage = (event) => {
+    const parsedData = JSON.parse(event.data);
+    if (parsedData.eventName === "updateTrack") {
+      const track = props.playlist.tracks.find(
+        (track) => track.id === parsedData.trackId
+      );
+
+      if (track && parsedData.name) {
+        track.name = parsedData.name;
+      }
+
+      if (track && parsedData.duration) {
+        track.duration = parsedData.duration;
+      }
+    }
+  };
+});
+
+onBeforeUnmount(() => {
+  ws.value?.close();
+});
 
 const props = defineProps<{
   username: string;
@@ -140,7 +162,7 @@ const addTrack = async (url: string) => {
       url,
       props.playlist.id
     );
-    props.playlist.tracks.push(result);
+    props.playlist.tracks.unshift(result);
   } catch (e) {
     console.log(e);
   }

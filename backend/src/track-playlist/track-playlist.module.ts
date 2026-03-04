@@ -9,6 +9,8 @@ import { UserModule } from 'src/user/user.module';
 import { Playlist } from './entities/playlist.entity';
 import { Track } from './entities/track.entity';
 import { PlaylistTrack } from './entities/playlist-track.entity';
+import { EventsGateway } from './tracks.gateway';
+import { WsUsersService } from 'src/ws-users/ws-users.service';
 
 @Module({
   imports: [
@@ -40,7 +42,7 @@ import { PlaylistTrack } from './entities/playlist-track.entity';
       },
     }),
   ],
-  providers: [TrackPlaylistService],
+  providers: [TrackPlaylistService, WsUsersService, EventsGateway],
   exports: [TrackPlaylistService],
   controllers: [TrackPlaylistController],
 })

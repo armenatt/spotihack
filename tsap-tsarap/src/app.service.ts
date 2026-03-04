@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import getMinutes from './utils/getMinutes';
 import * as Ffmpeg from 'fluent-ffmpeg';
 import { InjectS3, S3 } from 'nestjs-s3';
 import { createReadStream, createWriteStream } from 'node:fs';
@@ -15,7 +14,6 @@ import { getBasicInfo } from '@distube/ytdl-core';
 export class AppService implements OnModuleInit {
   private ytdlp = new YtDlp({
     binaryPath: '/usr/local/yt-dlp/yt-dlp',
-    ffmpegPath: '/usr/bin/ffmpeg',
   });
   constructor(
     @InjectS3() private readonly s3: S3,

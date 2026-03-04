@@ -4,17 +4,32 @@ volumes:
   db-data:
   garage-data:
   garage-meta:
+  certbot-certs:
+  certbot-www:
 
 
 
 services:
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: always
+    volumes:
+      - /usr/src/app/node_modules
+    depends_on:
+      - spotihack
+    networks:
+      - spotihack-shared-network
+    environment:
+      BASE_URL: ${BASE_URL}
+      CDN_URL: ${CDN_URL}
+      WS_URL: ${WS_URL}
+      PORT: 3001
+
   spotihack:
     container_name: backend
     build: ./backend
     restart: always
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 3000:3000
     depends_on:
@@ -26,6 +41,8 @@ services:
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_WEBSITE_ENDPOINT: ${S3_WEBSITE_ENDPOINT}
+      SECRET_CODE: ${JWT_SECRET_KEY}
+      ORIGIN: ${ORIGIN}
   db:
     image: postgres:17.5
     restart: always
@@ -55,18 +72,20 @@ services:
       S3_WEBSITE_ENDPOINT: ${S3_WEBSITE_ENDPOINT}
     networks:
       - spotihack-shared-network
-  s3-nginx:
+  nginx:
     build: ./openresty/
-    container_name: s3-nginx
-    depends_on:
-      - garage
+    container_name: nginx
     ports:
-      - 9999:123
+      - 80:80
+      - 443:443
     volumes:
       - ./openresty/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+      - certbot-certs:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
     environment:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      ORIGIN: ${ORIGIN}
     networks:
       - spotihack-shared-network
   garage:
@@ -84,6 +103,11 @@ services:
       - garage-data:/var/lib/garage/data
     networks:
       - spotihack-shared-network
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-certs:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
   kafka:
     container_name: kafka
     image: apache/kafka:latest

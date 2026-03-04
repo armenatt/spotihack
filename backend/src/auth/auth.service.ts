@@ -52,15 +52,24 @@ export class AuthService {
       },
       { secret: this.configService.get('SECRET_CODE'), expiresIn: '30d' },
     );
+    console.log('run');
 
     response.setCookie('authentication', accessToken, {
       httpOnly: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      maxAge: 7 * 24 * 60 * 60,
+      path: '/',
+      domain: '.spotihack.ru',
+      sameSite: 'none',
+      secure: true,
     });
 
     response.setCookie('refresh', refreshToken, {
       httpOnly: true,
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+      domain: '.spotihack.ru',
+      sameSite: 'none',
+      secure: true,
     });
 
     return {
@@ -108,12 +117,20 @@ export class AuthService {
 
     response.setCookie('authentication', refreshToken, {
       httpOnly: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      maxAge: 7 * 24 * 60 * 60,
+      domain: '.spotihack.ru',
+      sameSite: 'none',
+      secure: true,
+      path: '/',
     });
 
     response.setCookie('refresh', refreshToken, {
       httpOnly: true,
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      maxAge: 30 * 24 * 60 * 60,
+      domain: '.spotihack.ru',
+      sameSite: 'none',
+      secure: true,
+      path: '/',
     });
 
     return {

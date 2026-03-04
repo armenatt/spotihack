@@ -73,6 +73,13 @@ const prevTrack = computed(() => {
   return currentlyPlayingPlaylist.value?.tracks[index - 1];
 });
 
+watch(
+  () => currentlyPlayingTrack.value,
+  () => {
+    useHead({ title: currentlyPlayingTrack.value?.name });
+  }
+);
+
 const onTrackEnded = () => {
   currentlyPlayingTrack.value = nextTrack.value;
 };

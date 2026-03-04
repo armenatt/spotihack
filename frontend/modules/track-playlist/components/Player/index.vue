@@ -101,7 +101,7 @@ const mouseDown = ref(false);
 const flippedTime = ref(localStorage.flippedTime || false);
 
 const link = computed(() => {
-  return `${rc.public.cdnURL}/storage/${props.track?.id}/${props.track?.id}.m3u8`;
+  return `${rc.public.cdnURL}/${props.track?.id}/${props.track?.id}.m3u8`;
 });
 
 const normalizedTime = computed({
