@@ -53,9 +53,7 @@ const skeleton = computed(() => {
 });
 
 const duration = computed(() => {
-  return props.track.duration
-    ? getTimeFromSeconds(props.track.duration)
-    : "--:--";
+  return props.track.duration ? getTimeFromSeconds(props.track.duration) : "";
 });
 </script>
 
