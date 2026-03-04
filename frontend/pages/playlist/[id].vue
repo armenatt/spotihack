@@ -32,17 +32,16 @@ const playlist = ref<TPlaylist>();
 const {
   currentlyPlayingPlaylist,
   currentlyPlayingTrack,
-  currentlPlaylist,
+  currentPlaylist,
   isPlaying,
 } = storeToRefs(useTrackPlaylistStore());
 const { user } = storeToRefs(useAuthStore());
-useAsyncData(async () => {
+onMounted(async () => {
   playlist.value = await $services.trackPlaylistService.getPlaylistById(
     route.params.id as string
   );
+  currentPlaylist.value = playlist.value;
 });
-
-currentlPlaylist.value = playlist.value;
 
 const onChooseTrack = (track: TTrack) => {
   currentlyPlayingPlaylist.value = playlist.value;

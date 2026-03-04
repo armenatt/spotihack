@@ -51,7 +51,7 @@ const ws = ref<WebSocket>();
 const { user } = storeToRefs(useAuthStore());
 const {
   currentlyPlayingPlaylist,
-  currentlPlaylist,
+  currentPlaylist,
   currentlyPlayingTrack,
   isPlaying,
 } = storeToRefs(useTrackPlaylistStore());
@@ -65,7 +65,7 @@ onMounted(async () => {
   ws.value.onmessage = (event) => {
     const parsedData = JSON.parse(event.data);
     if (parsedData.eventName === "updateTrack") {
-      const track = currentlPlaylist.value?.tracks.find(
+      const track = currentPlaylist.value?.tracks.find(
         (track) => track.id === parsedData.trackId
       );
 
