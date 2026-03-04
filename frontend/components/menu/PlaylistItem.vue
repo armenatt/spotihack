@@ -1,5 +1,6 @@
 <template>
   <NuxtLink
+    v-if="!skeleton"
     class="playlist-item"
     :to="
       !$route.fullPath.includes('playlist')
@@ -32,6 +33,10 @@
       </slot>
     </div>
   </NuxtLink>
+  <div
+    v-else
+    :class="{ 'playlist-item': true, 'playlist-item--skeleton': skeleton }"
+  ></div>
 </template>
 
 <script setup lang="ts">
@@ -43,6 +48,7 @@ const props = defineProps<{
   playlist: TPlaylist;
   selected?: boolean;
   playing?: boolean;
+  skeleton?: boolean;
 }>();
 </script>
 
@@ -50,12 +56,13 @@ const props = defineProps<{
 .playlist-item {
   padding: 8px;
   display: flex;
+  position: relative;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   border-radius: 6px;
   text-decoration: none;
-
+  height: 64px;
   &:hover {
     background-color: hsla(0, 0%, 100%, 0.1);
   }
@@ -73,6 +80,20 @@ const props = defineProps<{
       width: 48px;
       height: 48px;
       border-radius: 10px;
+    }
+  }
+
+  &--skeleton {
+    background-color: #282828;
+    animation: skeleton ease-in-out 3s infinite alternate;
+
+    @keyframes skeleton {
+      33% {
+        opacity: 0.7;
+      }
+      67% {
+        opacity: 0.3;
+      }
     }
   }
 

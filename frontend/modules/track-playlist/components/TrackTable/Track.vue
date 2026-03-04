@@ -3,6 +3,7 @@
     :class="{
       track: true,
       'track--playing': choosen,
+      'track--skeleton': skeleton,
       'track--not-ready': track.status !== ETrackStatus.READY,
     }"
   >
@@ -18,13 +19,18 @@
         />
       </div>
     </div>
-    <div class="track__title" :title="track.name">
+    <div
+      :class="{ track__title: true, skeleton: skeleton }"
+      :title="track.name"
+    >
       {{ track.name }}
     </div>
     <div class="track__date-added">
       {{ dayjs(track.createdAt).format("YYYY-MM-DD") }}
     </div>
-    <div class="track__duration">{{ duration }}</div>
+    <div :class="{ track__duration: true, skeleton: skeleton }">
+      {{ duration }}
+    </div>
   </div>
 </template>
 
@@ -41,6 +47,14 @@ const props = defineProps<{
   playing: boolean;
   favouritePlaylist?: boolean;
 }>();
+
+const skeleton = computed(() => {
+  return (
+    [ETrackStatus.PROCESSING].includes(props.track.status) ||
+    !props.track.name ||
+    !props.track.duration
+  );
+});
 
 const duration = computed(() => {
   return getTimeFromSeconds(props.track.duration);
@@ -76,6 +90,25 @@ const duration = computed(() => {
     opacity: 0.4;
     user-select: none;
     pointer-events: none;
+  }
+
+  .skeleton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #282828;
+    width: 80%;
+    animation: skeleton ease-in-out 3s infinite alternate;
+    height: 24px;
+    border-radius: 5px;
+    @keyframes skeleton {
+      33% {
+        opacity: 0.7;
+      }
+      67% {
+        opacity: 0.3;
+      }
+    }
   }
 
   &__visualizer {

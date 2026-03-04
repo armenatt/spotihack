@@ -14,6 +14,7 @@
       <Menu
         :secondaryItems="playlists"
         :selectedPlaylistId="currentlyPlayingPlaylist?.id"
+        :loading="loading"
       />
       <div class="default-layout__content">
         <NuxtPage />
@@ -46,6 +47,8 @@ import type { TPlaylist } from "~/modules/track-playlist/entities";
 const { $services } = useNuxtApp();
 
 const playlists = ref<Omit<TPlaylist, "tracks">[]>();
+const loading = ref(false);
+
 const ws = ref<WebSocket>();
 
 const { user } = storeToRefs(useAuthStore());

@@ -1,15 +1,16 @@
 <template>
   <div class="menu">
     <nav class="menu__nav">
-      <PlaylistItem
-        v-for="item in props?.secondaryItems"
-        :title="item.favourite ? 'Favourite tracks' : item.name"
-        :playlist="item"
-        :selected="selectedPlaylistId === item.id"
-      />
-      <div v-if="!props.secondaryItems?.length" class="menu__empty">
-        NET NICHEGO
-      </div>
+      <template v-if="props.secondaryItems?.length && !loading">
+        <PlaylistItem
+          v-for="item in props?.secondaryItems"
+          :title="item.favourite ? 'Favourite tracks' : item.name"
+          :playlist="item"
+          :skeleton="loading"
+          :selected="selectedPlaylistId === item.id"
+        />
+      </template>
+      <div v-else-if="loading" class="menu__empty">NET NICHEGO</div>
       <!-- </div> -->
     </nav>
   </div>
@@ -22,6 +23,7 @@ import type { TPlaylist } from "~/modules/track-playlist/entities";
 const props = defineProps<{
   secondaryItems?: TPlaylist[];
   selectedPlaylistId?: string;
+  loading: boolean;
 }>();
 </script>
 
