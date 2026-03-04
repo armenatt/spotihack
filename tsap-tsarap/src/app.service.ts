@@ -46,7 +46,7 @@ export class AppService implements OnModuleInit {
     let videoId;
 
     if (link.includes('youtu.be')) {
-      videoId = new URL('link').pathname.replace('/', '');
+      videoId = new URL(link).pathname.replace('/', '');
     } else {
       videoId = new URLSearchParams(new URL(link).searchParams)
         .get('v')
