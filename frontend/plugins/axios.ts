@@ -1,31 +1,37 @@
-import axios, { type AxiosResponse } from "axios";
+import axios, {
+  AxiosError,
+  type AxiosRequestConfig,
+  type InternalAxiosRequestConfig,
+} from "axios";
 import { useAuthStore } from "~/modules/auth/adapters/store";
 
-async function onRejected(response: AxiosResponse) {
-  const { user } = storeToRefs(useAuthStore());
+async function onRejected(response: AxiosError) {
+  const authStore = useAuthStore();
+
+  const { accessToken } = storeToRefs(authStore);
   const { $services } = useNuxtApp();
-  if (
-    response.status === 401 &&
-    user.value?.accessToken &&
-    localStorage.authStore
-  ) {
+  if (response.status === 401 && accessToken.value) {
     const result = await $services.authService.refresh();
-    user.value.accessToken = result.data.accessToken;
-    return await axios(response.config);
-  } else if (response.status === 401) {
-    navigateTo("/login");
-    return Promise.reject(response);
+    localStorage.setItem("accessToken", result.data.accessToken);
+    accessToken.value = result.data.accessToken;
+    response.config?.headers.setAuthorization(`Bearer ${accessToken.value}`);
+    return await axios(response.response?.config as AxiosRequestConfig);
   }
+}
+
+function onAuth(config: InternalAxiosRequestConfig) {
+  const { accessToken } = storeToRefs(useAuthStore());
+  if (accessToken.value) {
+    config.headers.Authorization = `Bearer ${accessToken.value}`;
+  }
+
+  return config;
 }
 
 export default defineNuxtPlugin(() => {
   const rc = useRuntimeConfig();
-  const { user } = storeToRefs(useAuthStore());
 
   axios.defaults.baseURL = rc.public.baseURL;
-  axios.defaults.headers.common.Authorization = `Bearer ${user.value?.accessToken}`;
   axios.defaults.withCredentials = true;
-  axios.interceptors.response.use(function onFullfilled(config) {
-    return config;
-  }, onRejected);
+  axios.interceptors.request.use(onAuth, onRejected);
 });

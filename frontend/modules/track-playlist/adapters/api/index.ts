@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { TPlaylist, TTrack } from "../../entities";
+import type { TTrack } from "../../entities";
 
 export class TrackPlaylistApi {
   getPlaylistList() {

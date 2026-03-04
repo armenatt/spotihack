@@ -1,11 +1,7 @@
 import type { TrackPlaylistApi } from "../adapters/api";
 
 export class TrackPlaylistService {
-  constructor(
-    private api: TrackPlaylistApi,
-    private store: any,
-    private ws: WebSocket
-  ) {}
+  constructor(private api: TrackPlaylistApi) {}
 
   async getPlaylistList() {
     const res = await this.api.getPlaylistList();

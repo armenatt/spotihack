@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Post,
   Req,
@@ -33,5 +34,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
     return this.authService.refresh(req.user, res);
+  }
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  profile(@Req() req: { user: User }) {
+    return this.authService.profile(req.user.id);
   }
 }

@@ -9,6 +9,11 @@ export class AuthService {
     return result;
   }
 
+  async profile() {
+    const result = await this.api.profile();
+    return result.data;
+  }
+
   async register(
     fullName: string,
     password: string,

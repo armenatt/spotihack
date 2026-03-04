@@ -26,6 +26,7 @@ const signIn = async () => {
 
   if (result.data.accessToken) {
     user.value = result.data;
+    localStorage.setItem("accessToken", result.data.accessToken);
     const favPlaylist = user.value.playlists.find((p) => p.favourite);
     await navigateTo(`/playlist/${favPlaylist?.id}`);
   }

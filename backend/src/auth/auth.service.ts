@@ -24,6 +24,10 @@ export class AuthService {
     @Inject() private readonly configService: ConfigService,
   ) {}
 
+  profile(id: string) {
+    return this.userService.findOneById(id);
+  }
+
   async login(loginDto: LoginDto, response: FastifyReply) {
     const exists = await this.userService.findOneByEmail(loginDto.email);
 

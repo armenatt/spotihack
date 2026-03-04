@@ -1,7 +1,7 @@
 <template>
   <div class="playlists-page">
     <Playlist
-      v-if="playlist"
+      v-if="playlist && user"
       :playlist="playlist"
       :favourite-playlist="playlist?.favourite"
       :current-track="currentlyPlayingTrack"
@@ -32,10 +32,11 @@ const {
   isPlaying,
 } = storeToRefs(useTrackPlaylistStore());
 const { user } = storeToRefs(useAuthStore());
-
-playlist.value = await $services.trackPlaylistService.getPlaylistById(
-  route.params.id as string
-);
+onMounted(async () => {
+  playlist.value = await $services.trackPlaylistService.getPlaylistById(
+    route.params.id as string
+  );
+});
 
 currentlPlaylist.value = playlist.value;
 

@@ -2,6 +2,9 @@ import axios, { type AxiosResponse } from "axios";
 import type { TUser } from "../../entities";
 
 export class AuthApi {
+  profile() {
+    return axios.get<TUser>("auth/profile");
+  }
   login(email: string, password: string) {
     return axios.post<TUser>("/auth/login", { email, password });
   }

@@ -18,9 +18,6 @@ export const useTrackPlaylistStore = defineStore(
   {
     persist: {
       storage: localStorage,
-      afterHydrate: (context) => {
-        context.store.$hydrate();
-      },
     },
   }
 );

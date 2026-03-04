@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 import { ModalsContainer } from "vue-final-modal";
+import { useAuthStore } from "~/modules/auth/adapters/store";
 import { Player } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 import type { TPlaylist } from "~/modules/track-playlist/entities";
@@ -47,6 +48,7 @@ const { $services } = useNuxtApp();
 const playlists = ref<Omit<TPlaylist, "tracks">[]>();
 const ws = ref<WebSocket>();
 
+const { user } = storeToRefs(useAuthStore());
 const {
   currentlyPlayingPlaylist,
   currentlPlaylist,
@@ -55,6 +57,7 @@ const {
 } = storeToRefs(useTrackPlaylistStore());
 
 onMounted(async () => {
+  user.value = await $services.authService.profile();
   playlists.value = await $services.trackPlaylistService.getPlaylistList();
   const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
   ws.value = websocket;

@@ -10,11 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const authStore = useAuthStore();
   const authService = new AuthService(authApi, authStore);
   const trackPlaylistApi = new TrackPlaylistApi();
-  const trackPlaylistStore = useTrackPlaylistStore();
-  const trackPlaylistService = new TrackPlaylistService(
-    trackPlaylistApi,
-    trackPlaylistStore
-  );
+  const trackPlaylistService = new TrackPlaylistService(trackPlaylistApi);
 
   return {
     provide: {
