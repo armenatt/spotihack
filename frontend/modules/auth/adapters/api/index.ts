@@ -10,7 +10,6 @@ export class AuthApi {
   }
 
   register(
-    fullName: string,
     password: string,
     passwordConfirm: string,
     username: string,
@@ -18,7 +17,6 @@ export class AuthApi {
   ) {
     return axios.post("/auth/register", {
       email,
-      fullName,
       password,
       passwordConfirm,
       username,

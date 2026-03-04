@@ -36,13 +36,14 @@ const props = withDefaults(
 <style lang="scss">
 .s-input {
   width: 100%;
+  font-family: "AvenirNext", sans-serif;
+
   input {
     width: 100%;
     font-size: 16px;
     height: 50px;
     background-color: var(--blackish);
     color: var(--white);
-    font-family: "AvenirNext", sans-serif;
     padding: 15px 10px;
     outline: none;
     border: solid 1px var(--light-grey);
@@ -73,22 +74,23 @@ const props = withDefaults(
 
   &__error {
     display: flex;
+    align-items: center;
     gap: 5px;
     padding-top: 8px;
-    color: var(--white);
+    color: var(--text-negative);
   }
 
   &--error {
     input {
-      border: solid 1px red;
+      border: solid 1px var(--essential-negative);
     }
 
     input:hover {
-      box-shadow: inset 0 0 0 1px red;
+      box-shadow: inset 0 0 0 1px var(--essential-negative);
     }
 
     input:focus-within {
-      box-shadow: inset 0 0 0 2.5px red;
+      box-shadow: inset 0 0 0 2.5px var(--essential-negative);
     }
   }
 }

@@ -15,19 +15,12 @@ export class AuthService {
   }
 
   async register(
-    fullName: string,
     password: string,
     passwordConfirm: string,
     username: string,
     email: string
   ) {
-    return this.api.register(
-      fullName,
-      password,
-      passwordConfirm,
-      username,
-      email
-    );
+    return this.api.register(password, passwordConfirm, username, email);
   }
 
   refresh() {

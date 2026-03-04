@@ -1,14 +1,14 @@
 <template>
   <div class="login-form" @keypress.enter="signIn">
     <h1 class="login-form__label">Login to Spotihack</h1>
-    <SInput v-model="email" label="Email" placeholder="Email" />
+    <SInput v-model="email" type="email" label="Email" placeholder="Email" />
     <SInput
       v-model="password"
       label="Password"
       placeholder="Password"
       type="password"
     />
-    <SButton @click="signIn">Login</SButton>
+    <SButton :disabled="!valid" @click="signIn">Login</SButton>
     <SLink to="/sign-up">I don't have an account</SLink>
   </div>
 </template>
@@ -21,6 +21,11 @@ const password = ref<string>("");
 const { $services } = useNuxtApp();
 
 const { user, accessToken } = storeToRefs(useAuthStore());
+
+const valid = computed(() => {
+  return !!email.value.length && !!password.value.length;
+});
+
 const signIn = async () => {
   const result = await $services.authService.login(email.value, password.value);
 

@@ -66,6 +66,7 @@ const props = withDefaults(
 
   &--disabled {
     pointer-events: none;
+    user-select: none;
     opacity: 0.3;
     transform: scale(1);
   }
