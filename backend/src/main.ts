@@ -19,7 +19,7 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
-  app.enableCors({ credentials: true, origin: process.env.ORIGIN });
+  app.enableCors({ credentials: true, origin: true });
   app.useWebSocketAdapter(new WsAdapter(app));
 
   app.useGlobalPipes(new ValidationPipe());
