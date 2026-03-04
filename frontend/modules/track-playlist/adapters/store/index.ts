@@ -1,15 +1,26 @@
 import type { TPlaylist, TTrack } from "../../entities";
 
-export const useTrackPlaylistStore = defineStore("trackPlaylist", () => {
-  const currentlyPlayingPlaylist = ref<TPlaylist>();
-  const currentlPlaylist = ref<TPlaylist>();
-  const currentlyPlayingTrack = ref<TTrack>();
-  const isPlaying = ref(false);
+export const useTrackPlaylistStore = defineStore(
+  "trackPlaylist",
+  () => {
+    const currentlyPlayingPlaylist = ref<TPlaylist>();
+    const currentlPlaylist = ref<TPlaylist>();
+    const currentlyPlayingTrack = ref<TTrack>();
+    const isPlaying = ref(false);
 
-  return {
-    currentlPlaylist,
-    currentlyPlayingPlaylist,
-    currentlyPlayingTrack,
-    isPlaying,
-  };
-});
+    return {
+      currentlPlaylist,
+      currentlyPlayingPlaylist,
+      currentlyPlayingTrack,
+      isPlaying,
+    };
+  },
+  {
+    persist: {
+      storage: localStorage,
+      afterHydrate: (context) => {
+        context.store.$hydrate();
+      },
+    },
+  }
+);
