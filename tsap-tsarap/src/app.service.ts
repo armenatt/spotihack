@@ -42,9 +42,9 @@ export class AppService implements OnModuleInit {
     const writeStream = createWriteStream(
       process.cwd() + '/targetFolder/temp/' + id + '.mp3',
     );
-    const videoId = new URLSearchParams(new URL(link).searchParams).get('v');
+    // const videoId = new URLSearchParams(new URL(link).searchParams).get('v');
 
-    const result = this.ytdlp.stream(videoId!, {
+    const result = this.ytdlp.stream(link, {
       format: { filter: 'audioonly', quality: 10 },
     });
 
