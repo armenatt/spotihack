@@ -131,7 +131,6 @@ export class TrackPlaylistService implements OnModuleInit {
     if (res) {
       if (status === ETrackStatuses.Ready) {
         this.trackToUserMap.delete(res.userId);
-        return;
       }
       this.wsUserService.userToSocketMap.get(res.userId)?.send(
         JSON.stringify({
