@@ -49,15 +49,13 @@ const props = defineProps<{
 }>();
 
 const skeleton = computed(() => {
-  return (
-    [ETrackStatus.PROCESSING].includes(props.track.status) ||
-    !props.track.name ||
-    !props.track.duration
-  );
+  return !props.track.name || !props.track.duration;
 });
 
 const duration = computed(() => {
-  return getTimeFromSeconds(props.track.duration);
+  return props.track.duration
+    ? getTimeFromSeconds(props.track.duration)
+    : "--:--";
 });
 </script>
 
