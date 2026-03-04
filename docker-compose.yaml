@@ -42,6 +42,7 @@ services:
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_WEBSITE_ENDPOINT: ${S3_WEBSITE_ENDPOINT}
       SECRET_CODE: ${JWT_SECRET_KEY}
+      ORIGIN: ${ORIGIN}
   db:
     image: postgres:17.5
     restart: always
