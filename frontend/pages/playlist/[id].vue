@@ -25,13 +25,19 @@ const route = useRoute();
 
 const playlist = ref<TPlaylist>();
 
+const {
+  currentlyPlayingPlaylist,
+  currentlyPlayingTrack,
+  currentlPlaylist,
+  isPlaying,
+} = storeToRefs(useTrackPlaylistStore());
+const { user } = storeToRefs(useAuthStore());
+
 playlist.value = await $services.trackPlaylistService.getPlaylistById(
   route.params.id as string
 );
 
-const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
-  storeToRefs(useTrackPlaylistStore());
-const { user } = storeToRefs(useAuthStore());
+currentlPlaylist.value = playlist.value;
 
 const onChooseTrack = (track: TTrack) => {
   currentlyPlayingPlaylist.value = playlist.value;
