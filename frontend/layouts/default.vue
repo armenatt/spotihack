@@ -45,8 +45,31 @@ import type { TPlaylist } from "~/modules/track-playlist/entities";
 const { $services } = useNuxtApp();
 
 const playlists = ref<TPlaylist[]>();
+const ws = ref<WebSocket>();
 
 playlists.value = await $services.trackPlaylistService.getPlaylistList();
+
+onMounted(() => {
+  const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
+  ws.value = websocket;
+
+  ws.value.onmessage = (event) => {
+    const parsedData = JSON.parse(event.data);
+    if (parsedData.eventName === "updateTrack") {
+      const track = props.playlist.tracks.find(
+        (track) => track.id === parsedData.trackId
+      );
+
+      if (track && parsedData.name) {
+        track.name = parsedData.name;
+      }
+
+      if (track && parsedData.duration) {
+        track.duration = parsedData.duration;
+      }
+    }
+  };
+});
 
 const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
   storeToRefs(useTrackPlaylistStore());

@@ -14,7 +14,7 @@ import { WsUsersService } from 'src/ws-users/ws-users.service';
 
 @Injectable()
 export class TrackPlaylistService implements OnModuleInit {
-  public trackToUserMap: Map<string, string>;
+  public trackToUserMap: Map<string, { userId: string; playlistId: string }>;
 
   constructor(
     @InjectRepository(Playlist)
@@ -27,7 +27,10 @@ export class TrackPlaylistService implements OnModuleInit {
     @Inject() private readonly userService: UserService,
     @Inject() private readonly wsUserService: WsUsersService,
   ) {
-    this.trackToUserMap = new Map<string, string>();
+    this.trackToUserMap = new Map<
+      string,
+      { userId: string; playlistId: string }
+    >();
   }
 
   async onModuleInit() {
@@ -106,15 +109,15 @@ export class TrackPlaylistService implements OnModuleInit {
       messages: [{ key: 'track', value: JSON.stringify(newTrackInfo) }],
     });
 
-    this.addTrackToUserMap(user.id, newTrack.id);
+    this.addTrackToUserMap(user.id, newTrack.id, playlist.id);
 
     return {
       id: savedTrack.id,
     };
   }
 
-  addTrackToUserMap(userId: string, trackId: string) {
-    this.trackToUserMap.set(trackId, userId);
+  addTrackToUserMap(userId: string, trackId: string, playlistId: string) {
+    this.trackToUserMap.set(trackId, { userId, playlistId });
   }
 
   async updateTrack(
@@ -124,15 +127,20 @@ export class TrackPlaylistService implements OnModuleInit {
     duration?: number,
   ) {
     // TODO: refactor this
-    const userId = this.trackToUserMap.get(id);
-    if (userId) {
-      this.wsUserService.userToSocketMap.get(userId)?.send(
+    const res = this.trackToUserMap.get(id);
+    if (res) {
+      if (status === ETrackStatuses.Ready) {
+        this.trackToUserMap.delete(res.userId);
+        return;
+      }
+      this.wsUserService.userToSocketMap.get(res.userId)?.send(
         JSON.stringify({
           eventName: 'updateTrack',
           name,
           duration,
           trackId: id,
           status,
+          playlistId: res.playlistId,
         }),
       );
     }
