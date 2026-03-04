@@ -5,7 +5,6 @@ import { existsSync, mkdirSync } from 'fs';
 import { UploadTrackDto } from './dtos/upload-track-dto';
 import { ETrackStatuses } from './trackStatuses';
 import { rm } from 'fs/promises';
-import { validateURL } from '@distube/ytdl-core';
 
 @Controller()
 export class AppController {
@@ -13,7 +12,7 @@ export class AppController {
 
   @MessagePattern('tsap-tsarap.upload')
   async uploadTrack(@Payload() message: UploadTrackDto) {
-    const isValid = validateURL(message.link);
+    const isValid = new URL(message.link);
     if (!isValid) {
       console.log('error', 'Link not valid');
       return;

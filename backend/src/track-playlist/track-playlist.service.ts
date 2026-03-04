@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { ClientKafka } from '@nestjs/microservices';
 import { UserService } from 'src/user/user.service';
-import { validateURL } from '@distube/ytdl-core';
 import { Playlist } from './entities/playlist.entity';
 import { ETrackStatuses } from './entities/trackStatuses';
 import { PlaylistTrack } from './entities/playlist-track.entity';
