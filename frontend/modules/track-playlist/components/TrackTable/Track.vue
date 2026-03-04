@@ -1,5 +1,11 @@
 <template>
-  <div :class="{ track: true, 'track--playing': choosen }">
+  <div
+    :class="{
+      track: true,
+      'track--playing': choosen,
+      'track--not-ready': track.status !== ETrackStatus.READY,
+    }"
+  >
     <div class="track__first">
       <div v-if="!playing" class="track__number">
         {{ index + 1 }}
@@ -26,6 +32,7 @@
 import dayjs from "dayjs";
 import type { TTrack } from "../../entities";
 import { getTimeFromSeconds } from "~/helpers/getTimeFromSeconds";
+import { ETrackStatus } from "../../entities/trackStatuses";
 
 const props = defineProps<{
   index: number;
@@ -63,6 +70,12 @@ const duration = computed(() => {
     #{$self}__title {
       color: var(--green);
     }
+  }
+
+  &--not-ready {
+    opacity: 0.4;
+    user-select: none;
+    pointer-events: none;
   }
 
   &__visualizer {
