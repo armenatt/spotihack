@@ -86,7 +86,7 @@ const audio = useTemplateRef("audio");
 
 const emit = defineEmits(["play", "pause", "ended", "next", "prev"]);
 
-const { user } = storeToRefs(useAuthStore());
+const { user, accessToken } = storeToRefs(useAuthStore());
 
 const props = defineProps<{
   track?: TTrack;
@@ -118,7 +118,7 @@ const hls = new Hls({
   xhrSetup(xhr, url) {
     xhr.withCredentials = true;
     xhr.open("GET", url, true);
-    xhr.setRequestHeader("Authorization", `Bearer ${user.value?.accessToken}`);
+    xhr.setRequestHeader("Authorization", `Bearer ${accessToken.value}`);
   },
 });
 
