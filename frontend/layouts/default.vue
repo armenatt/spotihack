@@ -76,6 +76,10 @@ onMounted(async () => {
       if (track && parsedData.duration) {
         track.duration = parsedData.duration;
       }
+
+      if (track && parsedData.status) {
+        track.status = parsedData.status;
+      }
     }
   };
 });
