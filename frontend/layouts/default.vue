@@ -47,16 +47,18 @@ const { $services } = useNuxtApp();
 const playlists = ref<TPlaylist[]>();
 const ws = ref<WebSocket>();
 
-playlists.value = await $services.trackPlaylistService.getPlaylistList();
-
-onMounted(() => {
+onMounted(async () => {
+  playlists.value = await $services.trackPlaylistService.getPlaylistList();
   const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
   ws.value = websocket;
 
   ws.value.onmessage = (event) => {
     const parsedData = JSON.parse(event.data);
     if (parsedData.eventName === "updateTrack") {
-      const track = props.playlist.tracks.find(
+      const playlist = playlists.value?.find(
+        (playlist) => playlist.id === parsedData.playlistId
+      );
+      const track = playlist?.tracks.find(
         (track) => track.id === parsedData.trackId
       );
 
@@ -69,6 +71,9 @@ onMounted(() => {
       }
     }
   };
+});
+onBeforeUnmount(() => {
+  ws.value?.close();
 });
 
 const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =

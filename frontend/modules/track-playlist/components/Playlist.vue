@@ -78,12 +78,6 @@ const emit = defineEmits(["track", "playPlaylist"]);
 
 const { $services } = useNuxtApp();
 
-const ws = ref<WebSocket>();
-
-onBeforeUnmount(() => {
-  ws.value?.close();
-});
-
 const props = defineProps<{
   username: string;
   playlist: TPlaylist;
