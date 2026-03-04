@@ -1,9 +1,9 @@
 import { useAuthStore } from "~/modules/auth/adapters/store";
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { user } = storeToRefs(useAuthStore());
+  const { accessToken } = storeToRefs(useAuthStore());
 
-  if (user.value?.accessToken) {
-    await navigateTo("/login");
+  if (!accessToken.value.length || !localStorage.accessToken) {
+    navigateTo("/login");
   }
 });
