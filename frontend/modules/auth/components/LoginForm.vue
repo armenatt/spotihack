@@ -20,15 +20,16 @@ const email = ref<string>("");
 const password = ref<string>("");
 const { $services } = useNuxtApp();
 
-const { user } = storeToRefs(useAuthStore());
+const { user, accessToken } = storeToRefs(useAuthStore());
 const signIn = async () => {
   const result = await $services.authService.login(email.value, password.value);
 
   if (result.data.accessToken) {
     user.value = result.data;
     localStorage.setItem("accessToken", result.data.accessToken);
+    accessToken.value = result.data.accessToken;
     const favPlaylist = user.value.playlists.find((p) => p.favourite);
-    await navigateTo(`/playlist/${favPlaylist?.id}`);
+    await navigateTo("/playlist/" + favPlaylist?.id);
   }
 };
 </script>

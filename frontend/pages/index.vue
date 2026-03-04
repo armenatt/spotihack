@@ -1,3 +1,3 @@
 <script lang="ts" setup>
-definePageMeta({ middleware: "redirect-to-favourite" });
+// definePageMeta({ middleware: "redirect-to-favourite" });
 </script>

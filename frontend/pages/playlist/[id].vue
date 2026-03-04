@@ -20,6 +20,10 @@ import { Playlist } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 import type { TPlaylist, TTrack } from "~/modules/track-playlist/entities";
 
+definePageMeta({
+  middleware: "auth",
+});
+
 const { $services } = useNuxtApp();
 const route = useRoute();
 
@@ -32,7 +36,7 @@ const {
   isPlaying,
 } = storeToRefs(useTrackPlaylistStore());
 const { user } = storeToRefs(useAuthStore());
-onMounted(async () => {
+useAsyncData(async () => {
   playlist.value = await $services.trackPlaylistService.getPlaylistById(
     route.params.id as string
   );
