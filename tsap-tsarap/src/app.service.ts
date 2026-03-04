@@ -25,8 +25,16 @@ export class AppService implements OnModuleInit {
   }
 
   async getVideoInfo(link: string) {
-    const id = new URLSearchParams(new URL(link).searchParams).get('v');
-    const info = await getBasicInfo(id!);
+    let videoId;
+    if (link.includes('youtu.be')) {
+      videoId = new URL(link).pathname.replace('/', '');
+    } else {
+      videoId = new URLSearchParams(new URL(link).searchParams)
+        .get('v')
+        ?.toString();
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const info = await getBasicInfo(videoId);
 
     if (Number(info.videoDetails.lengthSeconds) / 60 > 10) {
       throw new Error('Video duration exceeds 10 minutes');
