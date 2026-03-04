@@ -44,8 +44,11 @@ import type { TPlaylist } from "~/modules/track-playlist/entities";
 
 const { $services } = useNuxtApp();
 
-const playlists = ref<TPlaylist[]>();
+const playlists = ref<Omit<TPlaylist, "tracks">[]>();
 const ws = ref<WebSocket>();
+
+const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
+  storeToRefs(useTrackPlaylistStore());
 
 onMounted(async () => {
   playlists.value = await $services.trackPlaylistService.getPlaylistList();
@@ -55,10 +58,7 @@ onMounted(async () => {
   ws.value.onmessage = (event) => {
     const parsedData = JSON.parse(event.data);
     if (parsedData.eventName === "updateTrack") {
-      const playlist = playlists.value?.find(
-        (playlist) => playlist.id === parsedData.playlistId
-      );
-      const track = playlist?.tracks.find(
+      const track = currentlyPlayingPlaylist.value?.tracks.find(
         (track) => track.id === parsedData.trackId
       );
 
@@ -75,9 +75,6 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   ws.value?.close();
 });
-
-const { currentlyPlayingPlaylist, currentlyPlayingTrack, isPlaying } =
-  storeToRefs(useTrackPlaylistStore());
 
 const nextTrack = computed(() => {
   const index = currentlyPlayingPlaylist.value?.tracks.findIndex(
