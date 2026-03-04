@@ -49,8 +49,14 @@ export class TrackPlaylistService implements OnModuleInit {
       };
     }
 
-    const urlParams = new URLSearchParams(new URL(link).searchParams);
-    const videoId = urlParams.get('v')!;
+    let videoId;
+    if (link.includes('youtu.be')) {
+      videoId = new URL('link').pathname.replace('/', '');
+    } else {
+      videoId = new URLSearchParams(new URL(link).searchParams)
+        .get('v')
+        ?.toString();
+    }
 
     const alreadyExists = await this.trackRepository.findOne({
       where: { videoId },
