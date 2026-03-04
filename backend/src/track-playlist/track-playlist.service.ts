@@ -42,8 +42,8 @@ export class TrackPlaylistService implements OnModuleInit {
     playlistId: string,
     user: { id: string; email: string },
   ) {
-    const isValidYTLink = validateURL(link);
-    if (!isValidYTLink) {
+    const isValidLink = new URL(link);
+    if (!isValidLink) {
       return {
         error: 'Link is invalid',
       };
