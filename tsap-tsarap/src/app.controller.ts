@@ -27,8 +27,10 @@ export class AppController {
     try {
       result = await this.appService.getVideoInfo(message.link);
     } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      return { message: err.message as string };
+      await this.appService.updateTrackStatus(message.id, {
+        status: ETrackStatuses.Failed,
+        id: message.id,
+      });
     }
 
     if (!result) {

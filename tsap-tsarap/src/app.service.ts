@@ -104,7 +104,12 @@ export class AppService implements OnModuleInit {
 
   async updateTrackStatus(
     id: string,
-    payload: { status: ETrackStatuses; name?: string; duration?: number },
+    payload: {
+      status: ETrackStatuses;
+      name?: string;
+      duration?: number;
+      id?: string;
+    },
   ) {
     await this.kafkaService.producer.send({
       topic: 'tsap-tsarap.upload.update-status',
