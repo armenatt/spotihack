@@ -12,6 +12,7 @@ rpc_secret = "9c67d0d558cfcf2821b4a0ab62ac1f85c32ec2b9a93ca35767de45181d9dde36"
 s3_region = "garage"
 api_bind_addr = "[::]:3900"
 root_domain = "localhost"
+request_workers = 32
 
 [s3_web]
 bind_addr = "[::]:3902"
