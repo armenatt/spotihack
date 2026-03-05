@@ -5,7 +5,7 @@ import { TrackPlaylistApi } from "~/modules/track-playlist/adapters/api";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
 import { TrackPlaylistService } from "~/modules/track-playlist/services";
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
   const authApi = new AuthApi();
   const authStore = useAuthStore();
   const authService = new AuthService(authApi, authStore);

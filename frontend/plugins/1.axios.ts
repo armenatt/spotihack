@@ -15,12 +15,14 @@ async function onRejected(response: AxiosError) {
     localStorage.setItem("accessToken", result.data.accessToken);
     accessToken.value = result.data.accessToken;
     response.config?.headers.setAuthorization(`Bearer ${accessToken.value}`);
+
     return await axios(response.response?.config as AxiosRequestConfig);
   }
 }
 
 function onAuth(config: InternalAxiosRequestConfig) {
   const { accessToken } = storeToRefs(useAuthStore());
+
   if (accessToken.value) {
     config.headers.Authorization = `Bearer ${accessToken.value}`;
   }
