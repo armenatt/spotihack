@@ -23,11 +23,16 @@ export class AppController {
       status: ETrackStatuses.Downloading,
     });
     console.log('info', 'Getting Info');
-
-    const result = await this.appService.getVideoInfo(message.link);
+    let result;
+    try {
+      result = await this.appService.getVideoInfo(message.link);
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      return { message: err.message as string };
+    }
 
     if (!result) {
-      return 'Not found';
+      return { message: 'Not found' };
     }
     console.log('info', 'Downloading');
 
