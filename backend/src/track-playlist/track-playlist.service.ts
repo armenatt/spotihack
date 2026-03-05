@@ -145,6 +145,7 @@ export class TrackPlaylistService implements OnModuleInit {
             id,
           }),
         );
+        await this.playlistTrackRepository.delete({ track: { id } });
         return this.trackRepository.delete({ id });
       }
 
