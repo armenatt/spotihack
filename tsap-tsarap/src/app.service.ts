@@ -64,7 +64,8 @@ export class AppService implements OnModuleInit {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const result = this.ytdlp.stream(videoId, {
       format: { filter: 'audioonly', quality: 10 },
-      limitRate: '10M',
+      limitRate: '2M',
+      throttledRate: '1M',
     });
 
     await result.pipeAsync(writeStream);
