@@ -84,15 +84,15 @@ onMounted(async () => {
         track.status = parsedData.status;
       }
     }
-  };
 
-  ws.value.onmessage = (event) => {
-    const parsedData = JSON.parse(event.data);
     if (parsedData.eventName === "deleteTrack") {
-      currentPlaylist.value!.tracks = currentPlaylist.value!.tracks.filter(
-        (track) => track.id !== parsedData.id
-      );
+      handleDeleteTrack(parsedData);
     }
+  };
+  const handleDeleteTrack = (event: any) => {
+    currentPlaylist.value!.tracks = currentPlaylist.value!.tracks.filter(
+      (track) => track.id !== event.id
+    );
   };
 });
 onBeforeUnmount(() => {
