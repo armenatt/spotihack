@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as Ffmpeg from 'fluent-ffmpeg';
@@ -61,12 +64,11 @@ export class AppService implements OnModuleInit {
         ?.toString();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const result = this.ytdlp.stream(videoId, {
-      format: { filter: 'audioonly', quality: 10 },
-      limitRate: '2M',
-      throttledRate: '1M',
-    });
+    const result = this.ytdlp
+      .stream(videoId as string)
+      .filter('audioonly')
+      .quality('highest')
+      .rateLimit('1M');
 
     await result.pipeAsync(writeStream);
   }
