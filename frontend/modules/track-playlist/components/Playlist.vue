@@ -45,7 +45,7 @@
       />
       <!-- <SInput /> -->
     </div>
-    <div v-if="playlist.trackCount" class="playlist__table">
+    <div v-if="playlist.tracks.length" class="playlist__table">
       <TrackTable :headers="headers">
         <Track
           v-for="(track, index) in playlist.tracks"
