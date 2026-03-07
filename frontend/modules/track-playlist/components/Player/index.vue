@@ -43,8 +43,9 @@
         </div>
         <div v-else class="player__time">--:--</div>
         <ProgressBar
-          v-model="normalizedTime"
+          v-model="currentTime"
           :disabled="!track"
+          :max="track?.duration"
           @mousepressed="mouseDown = true"
           @mousereleased="onMouseReleased"
         />
@@ -102,16 +103,6 @@ const flippedTime = ref(localStorage.flippedTime || false);
 
 const link = computed(() => {
   return `${rc.public.cdnURL}/${props.track?.id}/${props.track?.id}.m3u8`;
-});
-
-const normalizedTime = computed({
-  get() {
-    return (currentTime.value / (props.track?.duration ?? 1)) * 100;
-  },
-  set(value) {
-    currentTime.value = (value / 100) * (props.track?.duration ?? 1);
-    // currentTime.value = value;
-  },
 });
 
 const hls = new Hls({

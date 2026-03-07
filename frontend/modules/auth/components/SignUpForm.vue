@@ -1,5 +1,5 @@
 <template>
-  <div class="sign-up">
+  <div class="sign-up" @keypress.enter="signUp">
     <h1 class="sign-up__label">Sign Up</h1>
     <SInput
       v-model="email"

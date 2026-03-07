@@ -22,18 +22,21 @@
 const emit = defineEmits(["mousepressed", "mousereleased"]);
 const progressBar = useTemplateRef("progressBar");
 
-const percentage = defineModel<number>({
+const currentValue = defineModel<number>({
   required: true,
-  validator: (value: number) => value > -1 && value <= 100,
 });
 
 const progressBarWidth = ref(0);
 const mouseDown = ref(false);
 const mousePosition = ref();
 
-const props = defineProps<{
-  disabled?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    disabled?: boolean;
+    max?: number;
+  }>(),
+  { max: 100 }
+);
 
 const observer = new ResizeObserver(() => {
   progressBarWidth.value =
@@ -45,26 +48,26 @@ onMounted(() => {
 });
 
 const activeWidth = computed(() => {
-  return percentage.value * widthUnit.value;
+  return currentValue.value * widthUnit.value;
 });
 
 const widthUnit = computed(() => {
-  return progressBarWidth.value / 100;
+  return progressBarWidth.value / props.max;
 });
 
 const calculateDirectionAndDiff = (event: MouseEvent) => {
   const diff = Math.round(
     event.x -
       (progressBar.value?.getBoundingClientRect()?.x! +
-        percentage.value * widthUnit.value)
+        currentValue.value * widthUnit.value)
   );
-  const normalizedWidth = Math.abs(percentage.value * widthUnit.value);
+  const normalizedWidth = Math.abs(currentValue.value * widthUnit.value);
   const normalizedDiff = Math.round(
-    Math.abs((normalizedWidth + diff) / progressBarWidth.value) * 100
+    Math.abs((normalizedWidth + diff) / progressBarWidth.value) * props.max
   );
 
-  if (normalizedDiff > 100) {
-    return 100;
+  if (normalizedDiff > props.max) {
+    return props.max;
   }
 
   if (event.x <= progressBar.value?.getBoundingClientRect()?.x!) {
@@ -82,7 +85,7 @@ window.addEventListener("mouseup", () => {
 window.addEventListener("mousemove", (event) => {
   if (mouseDown.value) {
     mousePosition.value = Math.abs(event.pageX);
-    percentage.value = calculateDirectionAndDiff(event);
+    currentValue.value = calculateDirectionAndDiff(event);
   }
 });
 
@@ -90,7 +93,7 @@ const onClick = (event: MouseEvent) => {
   if (props.disabled) return;
   mouseDown.value = true;
   emit("mousepressed");
-  percentage.value = calculateDirectionAndDiff(event);
+  currentValue.value = calculateDirectionAndDiff(event);
 };
 
 onBeforeUnmount(() => {
