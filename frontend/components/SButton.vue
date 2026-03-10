@@ -23,6 +23,7 @@ enum EButtonVariants {
   PRIMARY = "primary",
   SECONDARY = "secondary",
   TEXT = "text",
+  DARK = "dark",
 }
 
 const props = withDefaults(
@@ -40,7 +41,7 @@ const props = withDefaults(
     iconOnly: false,
     icon: "",
     iconColor: "black",
-  }
+  },
 );
 </script>
 
@@ -62,6 +63,7 @@ const props = withDefaults(
   width: 100%;
 
   &__icon {
+    margin-right: 4px;
   }
 
   &--disabled {
@@ -156,6 +158,17 @@ const props = withDefaults(
     &:active {
       transform: scale(1);
       opacity: 0.7;
+    }
+  }
+
+  &--variant-dark {
+    color: white;
+    background-color: var(--dark-background);
+    height: 35px;
+    display: flex;
+    width: initial;
+    &:hover {
+      background-color: var(--dark-background-highlighted);
     }
   }
 }

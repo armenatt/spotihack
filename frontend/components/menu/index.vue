@@ -1,5 +1,11 @@
 <template>
   <div class="menu">
+    <div class=menu__header>
+      <span class="menu__header-title">
+        Playlists
+      </span>
+      <SButton type="dark" icon="plus" icon-color="white" @click="">Add playlist</SButton>
+    </div>
     <nav class="menu__nav">
       <template v-if="props.secondaryItems?.length && !loading">
         <PlaylistItem
@@ -13,10 +19,14 @@
       <div v-else-if="loading" class="menu__empty">NET NICHEGO</div>
       <!-- </div> -->
     </nav>
+    <div class="menu__footer">
+      <SButton type="dark" icon-color="white" @click="">Log out</SButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import SButton from "../SButton.vue";
 import PlaylistItem from "./PlaylistItem.vue";
 import type { TPlaylist } from "~/modules/track-playlist/entities";
 
@@ -31,20 +41,19 @@ const props = defineProps<{
 .menu {
   resize: horizontal;
   width: 420px;
+  height: 100%;
   grid-area: menu;
+  font-family: "Avenir Next", sans-serif;
 
   &__nav {
     scrollbar-width: none;
     display: flex;
     flex-direction: column;
-    height: 100%;
     gap: 8px;
-    align-items: stretch;
-
+    height: 100%;
     background-color: var(--blackish);
     padding: 8px;
     border-radius: 10px;
-    height: 100%;
     overflow-y: scroll;
   }
 
@@ -64,7 +73,21 @@ const props = defineProps<{
     -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
   }
 
-  &__secondary-nav {
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+  }
+
+  &__header-title {
+    margin-right: auto;
+    color: white;
   }
 
   &__empty {
