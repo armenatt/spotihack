@@ -1,16 +1,16 @@
 <template>
-  <SModal class="add-playlist-modal" title="Add Playlist" @close="$emit('close')">
+  <SModal class="add-track-modal" title="Add track" @close="$emit('close')">
     <SInput
-      v-model="name"
-      class="add-playlist-modal__input"
-      label="Playlist name"
-      placeholder="Eminem playlist"
+      v-model="url"
+      class="add-track-modal__input"
+      label="Track YouTube URL"
+      placeholder="https://www.youtube.com/watch?v=..."
     />
 
     <template #actions>
       <SButton
-        class="add-playlist-modal__action"
-        :disabled="loading || !name.length"
+        class="add-track-modal__action"
+        :disabled="loading || !url.length"
         type="secondary"
         @click="onAdd""
         >Add</SButton
@@ -26,15 +26,15 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
-const name = ref("");
+const url = ref("");
 
 const onAdd = () => {
-  emit("add", name.value);
+  emit("add", url.value);
 };
 </script>
 
 <style lang="scss">
-.add-playlist-modal {
+.add-track-modal {
   &__input {
     padding-bottom: 14px;
   }

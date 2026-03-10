@@ -12,10 +12,13 @@
     </div> -->
     <div class="default-layout__center">
       <Menu
+        v-if="playlists && !loading"
         :secondaryItems="playlists"
         :selectedPlaylistId="currentlyPlayingPlaylist?.id"
         :loading="loading"
+        @add-playlist="addPlaylist"
       />
+      <Menu v-else :loading="loading" @add-playlist="addPlaylist" />
       <div class="default-layout__content">
         <NuxtPage />
       </div>
@@ -38,15 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import { ModalsContainer } from "vue-final-modal";
+import { ModalsContainer, useModal } from "vue-final-modal";
 import { useAuthStore } from "~/modules/auth/adapters/store";
 import { Player } from "~/modules/track-playlist";
 import { useTrackPlaylistStore } from "~/modules/track-playlist/adapters/store";
-import type { TPlaylist } from "~/modules/track-playlist/entities";
+import AddPlaylistModal from "~/modules/track-playlist/components/modals/AddPlaylistModal.vue";
 
 const { $services } = useNuxtApp();
 
-const playlists = ref<Omit<TPlaylist, "tracks">[]>();
 const loading = ref(false);
 
 const ws = ref<WebSocket>();
@@ -57,11 +59,12 @@ const {
   currentPlaylist,
   currentlyPlayingTrack,
   isPlaying,
+  playlists,
 } = storeToRefs(useTrackPlaylistStore());
-
+const { getPlaylists } = useTrackPlaylistStore();
 onMounted(async () => {
   user.value = await $services.authService.profile();
-  playlists.value = await $services.trackPlaylistService.getPlaylistList();
+  await getPlaylists();
   const websocket = new WebSocket(useRuntimeConfig().public.wsURL);
   ws.value = websocket;
 
@@ -100,9 +103,10 @@ onBeforeUnmount(() => {
 });
 
 const nextTrack = computed(() => {
-  const index = currentlyPlayingPlaylist.value?.tracks.findIndex(
-    (track) => track.id === currentlyPlayingTrack.value?.id
-  );
+  const index =
+    currentlyPlayingPlaylist.value?.tracks.findIndex(
+      (track) => track.id === currentlyPlayingTrack.value?.id
+    ) || 0;
 
   if (index < 0) {
     return undefined;
@@ -128,6 +132,29 @@ watch(
   }
 );
 
+const addPlaylist = () => {
+  const { open, close, patchOptions } = useModal({
+    component: AddPlaylistModal,
+    attrs: {
+      onClose() {
+        close();
+      },
+      async onAdd(name: string) {
+        patchOptions({ attrs: { loading: true } });
+        const result = await $services.trackPlaylistService.createPlaylist(
+          name
+        );
+        await getPlaylists();
+        navigateTo(`${result.id}`);
+        patchOptions({ attrs: { loading: false } });
+        close();
+      },
+      loading: false,
+    },
+  });
+  open();
+};
+
 const onTrackEnded = () => {
   currentlyPlayingTrack.value = nextTrack.value;
 };
@@ -143,34 +170,25 @@ const onPrev = () => {
 
 <style lang="scss">
 .default-layout {
-  display: grid;
-  // flex-direction: column;
+  display: flex;
+  flex-direction: column;
   background-color: black;
-  min-height: 100vh;
-  height: 100vh;
-  grid-template-areas:
-    "header header header"
-    "center center center"
-    "player player player";
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr auto;
+  justify-content: space-between;
+  height: 100%;
 
   &__header {
     min-height: 64px;
-    grid-area: header;
   }
 
   &__center {
     display: flex;
     padding: 0 8px;
     gap: 8px;
-    overflow-y: auto;
-    grid-area: center;
+    height: calc(100% - var(--player-height));
   }
 
   &__player {
-    min-height: 88px;
-    grid-area: player;
+    min-height: var(--player-height);
   }
 
   &__content {
@@ -179,6 +197,7 @@ const onPrev = () => {
     overflow-y: hidden;
     border-radius: 10px;
     color: var(--white);
+    height: 100%;
   }
 }
 </style>

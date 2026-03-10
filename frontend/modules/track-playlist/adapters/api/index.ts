@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { TTrack } from "../../entities";
+import type { TPlaylist, TTrack } from "../../entities";
 
 export class TrackPlaylistApi {
   getPlaylistList() {
@@ -15,5 +15,9 @@ export class TrackPlaylistApi {
       link: url,
       playlistId,
     });
+  }
+
+  createPlaylist(name: string) {
+    return axios.post<TPlaylist>("/playlist/create", { name });
   }
 }

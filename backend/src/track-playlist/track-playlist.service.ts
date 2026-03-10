@@ -213,7 +213,8 @@ export class TrackPlaylistService implements OnModuleInit {
     });
     playlist.playlistTrack.push(playlistTrack);
     await this.playlistTrackRepository.save(playlistTrack);
-    return this.playlistRepository.save(playlist);
+    await this.playlistRepository.save(playlist);
+    return track;
   }
 
   async getPlaylistList(userId: string) {

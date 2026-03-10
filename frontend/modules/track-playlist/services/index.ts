@@ -18,7 +18,8 @@ export class TrackPlaylistService {
     return res.data;
   }
 
-  updateTrack() {
-    // this.ws.
+  async createPlaylist(name: string) {
+    const res = await this.api.createPlaylist(name);
+    return res.data;
   }
 }

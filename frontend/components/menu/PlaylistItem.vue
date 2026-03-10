@@ -2,6 +2,7 @@
   <NuxtLink
     v-if="!skeleton"
     class="playlist-item"
+    :data-id="playlist.id"
     :to="
       !$route.fullPath.includes('playlist')
         ? 'playlist/' + playlist.id

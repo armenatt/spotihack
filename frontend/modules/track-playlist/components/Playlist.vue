@@ -72,11 +72,14 @@ import { useModal } from "vue-final-modal";
 import type { TPlaylist, TTrack } from "../entities";
 import TrackTable from "./TrackTable/index.vue";
 import Track from "./TrackTable/Track.vue";
-import AddPlaylistModal from "./modals/AddPlaylistModal.vue";
+import AddTrackModal from "./modals/AddTrackModal.vue";
+import { useTrackPlaylistStore } from "../adapters/store";
 
 const emit = defineEmits(["track", "playPlaylist"]);
 
 const { $services } = useNuxtApp();
+
+const { getPlaylists } = useTrackPlaylistStore();
 
 const props = defineProps<{
   username: string;
@@ -111,7 +114,7 @@ const numberOfSongs = computed(() => {
 
 const openAddVideoModal = () => {
   const { open, close, patchOptions } = useModal({
-    component: AddPlaylistModal,
+    component: AddTrackModal,
     attrs: {
       onClose() {
         close();
@@ -135,6 +138,7 @@ const addTrack = async (url: string) => {
       props.playlist.id
     );
     props.playlist.tracks.unshift(result);
+    await getPlaylists();
   } catch (e) {
     console.log(e);
   }

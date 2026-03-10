@@ -6,4 +6,14 @@
 
 html {
   background: var(--dark-grey);
+  height: 100%;
+}
+
+body {
+  background-color: var(--dark-grey);
+  height: 100%;
+}
+
+#__nuxt {
+  height: 100% !important;
 }
