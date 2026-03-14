@@ -10,6 +10,8 @@ async function onRejected(response: AxiosError) {
 
   const { accessToken } = storeToRefs(authStore);
   const { $services } = useNuxtApp();
+  console.log(response);
+
   if (response.status === 401 && accessToken.value?.length) {
     const result = await $services.authService.refresh();
     localStorage.setItem("accessToken", result.data.accessToken);
