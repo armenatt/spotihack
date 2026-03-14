@@ -6,11 +6,11 @@ import axios, {
 import { useAuthStore } from "~/modules/auth/adapters/store";
 
 async function onRejected(response: AxiosError) {
+  console.log(response);
   const authStore = useAuthStore();
 
   const { accessToken } = storeToRefs(authStore);
   const { $services } = useNuxtApp();
-  console.log(response);
 
   if (response.status === 401 && accessToken.value?.length) {
     const result = await $services.authService.refresh();
