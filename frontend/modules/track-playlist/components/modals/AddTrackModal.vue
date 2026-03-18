@@ -12,7 +12,7 @@
         class="add-track-modal__action"
         :disabled="loading || !url.length"
         type="secondary"
-        @click="onAdd""
+        @click="onAdd"
         >Add</SButton
       >
     </template>
