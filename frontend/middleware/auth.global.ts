@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const { accessToken } = storeToRefs(useAuthStore());
 
   if (
-    !accessToken.value.length &&
+    !accessToken.value?.length &&
     !localStorage.accessToken &&
     to.path !== "/login" &&
     to.path !== "/sign-up"

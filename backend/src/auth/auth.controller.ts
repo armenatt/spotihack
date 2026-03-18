@@ -27,13 +27,12 @@ export class AuthController {
   login(@Body() body: LoginDto, @Res({ passthrough: true }) res: FastifyReply) {
     return this.authService.login(body, res);
   }
-  @UseGuards(AuthGuard)
   @Post('refresh')
   refresh(
-    @Req() req: { user: User },
+    @Body() body: {refreshToken: string},
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    return this.authService.refresh(req.user, res);
+    return this.authService.refresh(body.refreshToken, res);
   }
   @UseGuards(AuthGuard)
   @Get('profile')

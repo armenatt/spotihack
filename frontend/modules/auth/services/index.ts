@@ -23,7 +23,7 @@ export class AuthService {
     return this.api.register(password, passwordConfirm, username, email);
   }
 
-  refresh() {
-    return this.api.refresh();
+  refresh(refreshToken: string) {
+    return this.api.refresh(refreshToken);
   }
 }

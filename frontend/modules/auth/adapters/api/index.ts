@@ -13,7 +13,7 @@ export class AuthApi {
     password: string,
     passwordConfirm: string,
     username: string,
-    email: string
+    email: string,
   ) {
     return axios.post("/auth/register", {
       email,
@@ -23,7 +23,10 @@ export class AuthApi {
     });
   }
 
-  refresh() {
-    return axios.post<{ accessToken: string }>("/auth/refresh");
+  refresh(refreshToken: string) {
+    return axios.post<{ accessToken: string; refreshToken: string }>(
+      "/auth/refresh",
+      { refreshToken },
+    );
   }
 }

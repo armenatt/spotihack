@@ -111,17 +111,24 @@ export class AuthService {
     return newUser;
   }
 
-  async refresh(user: User, response: FastifyReply) {
-    const refreshToken = await this.jwtService.signAsync(
-      {
-        ...user,
-      },
-      { secret: this.configService.getOrThrow('SECRET_CODE') },
+  async refresh(token: string, response: FastifyReply) {
+    const sevenDays =  7 * 24 * 60 * 60;
+    const thirtyDays = 30 * 24 * 60 * 60;
+
+    const accessToken = await this.jwtService.verifyAsync(
+      token,
+      { secret: this.configService.getOrThrow('SECRET_CODE'), 'maxAge': sevenDays},
+    )
+
+
+    const refreshToken = await this.jwtService.verifyAsync(
+      token,
+      { secret: this.configService.getOrThrow('SECRET_CODE'), 'maxAge': thirtyDays},
     );
 
-    response.setCookie('authentication', refreshToken, {
+    response.setCookie('authentication', accessToken, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: sevenDays,
       domain: '.spotihack.ru',
       sameSite: 'none',
       secure: true,
@@ -130,7 +137,7 @@ export class AuthService {
 
     response.setCookie('refresh', refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: thirtyDays,
       domain: '.spotihack.ru',
       sameSite: 'none',
       secure: true,
@@ -138,7 +145,8 @@ export class AuthService {
     });
 
     return {
-      accessToken: refreshToken,
+      accessToken,
+      refreshToken 
     };
   }
 }
