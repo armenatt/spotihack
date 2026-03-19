@@ -9,7 +9,10 @@
         $emit('update:modelValue', (<HTMLInputElement>$event.target).value)
       "
     />
-    <div v-if="props.error" class="s-input__error">
+    <div
+      v-if="typeof props.error !== 'boolean' && props.error?.length"
+      class="s-input__error"
+    >
       <SIcon icon-name="exclamation-circle" color="red" />
       {{ props.error }}
     </div>
@@ -22,7 +25,7 @@ import type { InputTypeHTMLAttribute } from "vue";
 const props = withDefaults(
   defineProps<{
     label?: string;
-    error?: string;
+    error?: string | boolean;
     modelValue?: string;
     placeholder?: string;
     type?: InputTypeHTMLAttribute;
